@@ -1,0 +1,72 @@
+[
+  {
+    "id": "ps",
+    "name": "Professional Services",
+    "short": "PS",
+    "color": "#2563eb",
+    "icon": "briefcase",
+    "leadEmpId": "E003",
+    "managerEmpId": "E018",
+    "description": "Cloud architecture, AWS advisory, client delivery"
+  },
+  {
+    "id": "ms",
+    "name": "Managed Services",
+    "short": "MS",
+    "color": "#0891b2",
+    "icon": "shield",
+    "leadEmpId": "E061",
+    "managerEmpId": "E062",
+    "description": "24×7 monitoring, incident response, automation"
+  },
+  {
+    "id": "it",
+    "name": "IT Operations",
+    "short": "IT",
+    "color": "#7c3aed",
+    "icon": "cog",
+    "leadEmpId": "E063",
+    "managerEmpId": "E064",
+    "description": "Internal IT, endpoint security, helpdesk"
+  },
+  {
+    "id": "mkt",
+    "name": "Marketing",
+    "short": "MKT",
+    "color": "#db2777",
+    "icon": "megaphone",
+    "leadEmpId": "E065",
+    "managerEmpId": "E066",
+    "description": "Brand, content, demand-side marketing"
+  },
+  {
+    "id": "dg",
+    "name": "Demand Generation",
+    "short": "DG",
+    "color": "#ea580c",
+    "icon": "trending",
+    "leadEmpId": "E067",
+    "managerEmpId": "E068",
+    "description": "Outbound, SDR pipeline, MQL handoff"
+  },
+  {
+    "id": "sal",
+    "name": "Sales",
+    "short": "SAL",
+    "color": "#16a34a",
+    "icon": "chart",
+    "leadEmpId": "E069",
+    "managerEmpId": "E070",
+    "description": "Account exec, deal closure, renewals"
+  },
+  {
+    "id": "pm",
+    "name": "Project Management",
+    "short": "PM",
+    "color": "#475569",
+    "icon": "tasks",
+    "leadEmpId": "E006",
+    "managerEmpId": "E071",
+    "description": "Project delivery, client engagement health"
+  }
+]

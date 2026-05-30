@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PM Portal · SUDO Employee Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../shared/filterbar.css" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body class="theme-pm">
+
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand__mark">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 6h12a4 4 0 0 1 0 8H8a4 4 0 0 0 0 8h12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="brand__text">
+      <div class="brand__name">SUDO</div>
+      <div class="brand__sub">Employee Portal</div>
+    </div>
+  </div>
+
+  <div class="role-switch">
+    <div class="role-switch__label">Signed in as</div>
+    <button class="role-switch__btn" id="role-switch-btn">
+      <span class="role-pill role-pill--pm">PM</span>
+      <span class="role-switch__name">Fatima Al Zaabi</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+  <nav class="nav" id="nav">
+    <div class="nav__group">
+      <div class="nav__heading">PM Workspace</div>
+    </div>
+  </nav>
+
+  <div class="sidebar__foot">
+    <div class="sidebar__foot-team">
+      <div class="sidebar__foot-team-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM5 21v-2a4 4 0 014-4h6a4 4 0 014 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </div>
+      <div class="sidebar__foot-text">
+        <div>My team</div>
+        <div class="sidebar__foot-sub">8 people · Delivery</div>
+      </div>
+    </div>
+  </div>
+</aside>
+<div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+<main class="main">
+  <header class="topbar">
+    <div class="topbar__left">
+    <button class="menu-toggle" id="menu-toggle" aria-label="Open menu">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+      <h1 class="topbar__title" id="page-title">My Team Dashboard</h1>
+      <div class="topbar__breadcrumb" id="page-breadcrumb">
+        <span>Tuesday, 12 May 2026</span>
+        <span class="dot-sep">•</span>
+        <span>Delivery · 8 team members</span>
+      </div>
+    </div>
+    <div class="topbar__right">
+      <div class="search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input type="text" placeholder="Search my team…" id="global-search" />
+        <kbd>⌘K</kbd>
+      </div>
+      <button class="icon-btn" id="notif-btn" aria-label="Notifications">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0a3 3 0 11-6 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="badge">3</span>
+      </button>
+      <button class="btn btn--primary" id="schedule-feedback-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Schedule 1:1
+      </button>
+    </div>
+  </header>
+
+  <div id="page-content"></div>
+</main>
+
+<div class="overlay" id="overlay"></div>
+<aside class="slideover" id="slideover">
+  <header class="slideover__head">
+    <button class="icon-btn" id="slideover-close">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <h3 id="slideover-title">Detail</h3>
+  </header>
+  <div class="slideover__body" id="slideover-body"></div>
+</aside>
+
+<div class="notif-dropdown" id="notif-dropdown">
+  <header class="notif-dropdown__head">
+    <h4>Notifications</h4>
+    <a href="#">Mark all read</a>
+  </header>
+  <div class="notif-dropdown__body" id="notif-body"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../shared/filterbar.js"></script>
+<script src="../shared/pagination.js"></script>
+<script src="../shared/role-switcher.js"></script>
+<script src="../shared/charts.js"></script>
+<script src="../shared/layout-prefs.js"></script>
+<script src="../shared/api.js"></script>
+  <script src="../shared/auth.js"></script>
+  <script src="../shared/db.js"></script>
+  <script src="../shared/hydrate.js"></script>
+<script src="dashboard.js"></script>
+</body>
+</html>

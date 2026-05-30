@@ -1,0 +1,59 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-sudo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sudo}
+      POSTGRES_DB: ${POSTGRES_DB:-sudo_portal}
+    volumes:
+      - sudo_pg_data_staging:/var/lib/postgresql/data
+    # No host port — internal access only on staging
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sudo} -d ${POSTGRES_DB:-sudo_portal}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: staging
+      DATABASE_URL: postgres://${POSTGRES_USER:-sudo}:${POSTGRES_PASSWORD:-sudo}@db:5432/${POSTGRES_DB:-sudo_portal}
+      # Staging-specific behaviour
+      ALLOW_DESTRUCTIVE_SEED: "true"
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    # In production, run the compiled output. Staging mirrors that to
+    # exercise the same code path that prod will use.
+    command: npm run start --workspace apps/api
+
+  # Run once on staging boot: migrate + seed
+  seed:
+    image: sudo-portal-backend-api:latest
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-sudo}:${POSTGRES_PASSWORD:-sudo}@db:5432/${POSTGRES_DB:-sudo_portal}
+      ALLOW_DESTRUCTIVE_SEED: "true"
+    env_file:
+      - .env
+    command: >
+      sh -c "npm run db:migrate:deploy --workspace apps/api &&
+             npm run db:seed --workspace apps/api"
+    restart: "no"
+
+volumes:
+  sudo_pg_data_staging:

@@ -1,0 +1,7 @@
+# This directory holds Prisma migrations.
+#
+# On first install, run `scripts/first-install.sh` which creates a `0001_init/`
+# migration here, then commit that to git. After that, every subsequent
+# `prisma migrate dev --name <change>` adds a new directory you also commit.
+#
+# DO NOT delete this file — it keeps the directory tracked even when empty.

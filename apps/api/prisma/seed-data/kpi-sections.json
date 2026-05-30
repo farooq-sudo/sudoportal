@@ -1,0 +1,146 @@
+[
+  {
+    "id": "ms-imm",
+    "teamId": "ms",
+    "label": "Incident Management & Monitoring",
+    "order": 1
+  },
+  {
+    "id": "ms-sc",
+    "teamId": "ms",
+    "label": "Security & Compliance",
+    "order": 2
+  },
+  {
+    "id": "ms-corm",
+    "teamId": "ms",
+    "label": "Cost Optimisation & Resource Management",
+    "order": 3
+  },
+  {
+    "id": "ms-ad",
+    "teamId": "ms",
+    "label": "Automation & DevOps",
+    "order": 4
+  },
+  {
+    "id": "ms-oetp",
+    "teamId": "ms",
+    "label": "Operational Excellence & Team Performance",
+    "order": 5
+  },
+  {
+    "id": "ps-delv",
+    "teamId": "ps",
+    "label": "Delivery Excellence",
+    "order": 1
+  },
+  {
+    "id": "ps-tech",
+    "teamId": "ps",
+    "label": "Technical Quality",
+    "order": 2
+  },
+  {
+    "id": "ps-cert",
+    "teamId": "ps",
+    "label": "Certifications & Learning",
+    "order": 3
+  },
+  {
+    "id": "ps-cust",
+    "teamId": "ps",
+    "label": "Customer Engagement",
+    "order": 4
+  },
+  {
+    "id": "it-svc",
+    "teamId": "it",
+    "label": "Service Desk & Endpoint",
+    "order": 1
+  },
+  {
+    "id": "it-sec",
+    "teamId": "it",
+    "label": "Internal Security",
+    "order": 2
+  },
+  {
+    "id": "it-proj",
+    "teamId": "it",
+    "label": "IT Project Delivery",
+    "order": 3
+  },
+  {
+    "id": "mkt-pipe",
+    "teamId": "mkt",
+    "label": "Pipeline Influence",
+    "order": 1
+  },
+  {
+    "id": "mkt-cont",
+    "teamId": "mkt",
+    "label": "Content & Brand",
+    "order": 2
+  },
+  {
+    "id": "mkt-evt",
+    "teamId": "mkt",
+    "label": "Events & Field",
+    "order": 3
+  },
+  {
+    "id": "dg-pipe",
+    "teamId": "dg",
+    "label": "Pipeline Generation",
+    "order": 1
+  },
+  {
+    "id": "dg-qual",
+    "teamId": "dg",
+    "label": "Lead Quality",
+    "order": 2
+  },
+  {
+    "id": "dg-act",
+    "teamId": "dg",
+    "label": "Activity Metrics",
+    "order": 3
+  },
+  {
+    "id": "sal-rev",
+    "teamId": "sal",
+    "label": "Revenue & Quota",
+    "order": 1
+  },
+  {
+    "id": "sal-eng",
+    "teamId": "sal",
+    "label": "Engagement & Outreach",
+    "order": 2
+  },
+  {
+    "id": "sal-ren",
+    "teamId": "sal",
+    "label": "Renewals & Retention",
+    "order": 3
+  },
+  {
+    "id": "pm-delv",
+    "teamId": "pm",
+    "label": "Delivery Health",
+    "order": 1
+  },
+  {
+    "id": "pm-cust",
+    "teamId": "pm",
+    "label": "Customer Satisfaction",
+    "order": 2
+  },
+  {
+    "id": "pm-fin",
+    "teamId": "pm",
+    "label": "Financial Discipline",
+    "order": 3
+  }
+]

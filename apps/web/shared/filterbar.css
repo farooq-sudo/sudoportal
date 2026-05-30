@@ -1,0 +1,300 @@
+/* SUDO Portal — Shared FilterBar styles
+   Applied across Employee, HR, PM, TL, Admin portals. */
+
+.fb {
+  display: flex; flex-direction: column;
+  gap: 10px; margin-bottom: 14px;
+}
+
+/* Tabs */
+.fb__tabs {
+  display: flex; gap: 2px;
+  border-bottom: 1px solid var(--ink-200);
+  overflow-x: auto;
+}
+.fb__tab {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 14px; font-size: 12.5px; font-weight: 600;
+  background: transparent; border: 0; color: var(--ink-500);
+  cursor: pointer; border-bottom: 2px solid transparent;
+  position: relative; top: 1px; font-family: inherit;
+  transition: color 140ms;
+  white-space: nowrap;
+}
+.fb__tab:hover { color: var(--ink-900); }
+.fb__tab--active { color: var(--bright); border-bottom-color: var(--bright); }
+.fb__tab-count {
+  background: var(--ink-200); color: var(--ink-700);
+  font-size: 10.5px; font-weight: 700;
+  padding: 1px 7px; border-radius: 999px;
+}
+.fb__tab--active .fb__tab-count { background: var(--tint-3); color: var(--bright); }
+
+/* Row containing views + controls */
+.fb__row {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+
+/* View switcher */
+.fb__views {
+  display: inline-flex; background: var(--paper);
+  border: 1px solid var(--ink-200);
+  border-radius: 8px; padding: 3px; gap: 2px;
+}
+.fb__view-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: transparent; border: 0;
+  padding: 6px 12px; font-size: 12px; font-weight: 600;
+  color: var(--ink-500); cursor: pointer; border-radius: 6px;
+  font-family: inherit;
+  transition: all 140ms;
+}
+.fb__view-btn:hover { color: var(--ink-900); }
+.fb__view-btn--active { background: var(--tint-3); color: var(--bright); }
+.fb__view-btn svg { width: 13px; height: 13px; }
+
+/* Controls (period, filters, search, download) */
+.fb__controls {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin-left: auto;
+}
+
+/* Period dropdown + custom date range */
+.fb__period { display: flex; gap: 6px; align-items: center; }
+.fb__custom-range {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--paper); border: 1px solid var(--ink-200);
+  padding: 4px 10px; border-radius: 8px; height: 32px;
+}
+.fb__cal { display: inline-flex; color: var(--ink-500); }
+.fb__date {
+  border: 0; background: transparent; font-family: var(--font-mono);
+  font-size: 12px; color: var(--ink-900); padding: 2px 4px;
+  outline: 0; cursor: pointer;
+}
+.fb__date::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.6; }
+.fb__dash { color: var(--ink-400); font-weight: 700; }
+
+/* Generic select */
+.fb__select {
+  height: 32px; min-width: 140px;
+  border: 1px solid var(--ink-200); background: var(--paper);
+  border-radius: 8px; padding: 0 28px 0 10px;
+  font-size: 12.5px; color: var(--ink-700); font-family: inherit;
+  cursor: pointer; outline: 0;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%235B6781' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+.fb__select:hover { border-color: var(--ink-300); }
+.fb__select:focus { border-color: var(--bright); }
+
+/* Search */
+.fb__search {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--paper); border: 1px solid var(--ink-200);
+  border-radius: 8px; padding: 0 10px; height: 32px;
+}
+.fb__search:focus-within { border-color: var(--bright); }
+.fb__search svg { color: var(--ink-400); flex-shrink: 0; }
+.fb__search-input {
+  border: 0; background: transparent; font-family: inherit;
+  font-size: 12.5px; color: var(--ink-900); outline: 0;
+  width: 180px; padding: 6px 0;
+}
+.fb__search-input::placeholder { color: var(--ink-400); }
+
+/* Download button */
+.fb__dl {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 32px; padding: 0 12px;
+  background: var(--paper); border: 1px solid var(--ink-200);
+  border-radius: 8px; font-family: inherit;
+  font-size: 12.5px; font-weight: 600; color: var(--ink-700);
+  cursor: pointer;
+  transition: all 140ms;
+}
+.fb__dl:hover { border-color: var(--bright); color: var(--bright); }
+.fb__dl svg { width: 13px; height: 13px; }
+
+/* ============================================================
+   Role switcher — top-right header position
+   Only shown to HR / PM / TL / Admin (never Employee)
+   Uses SUDO brand kit only (navy + bright)
+============================================================ */
+.role-switcher--top {
+  position: relative;
+  margin-left: 10px;
+}
+.role-switcher__btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 36px; padding: 0 12px;
+  background: var(--paper);
+  border: 1px solid var(--ink-200);
+  border-radius: 8px;
+  color: var(--ink-700);
+  font-family: inherit;
+  font-size: 12.5px; font-weight: 600;
+  cursor: pointer; transition: all 140ms;
+}
+.role-switcher__btn:hover {
+  border-color: var(--bright);
+  color: var(--bright);
+}
+.role-switcher__btn svg { flex-shrink: 0; }
+.role-switcher__arrow { transition: transform 140ms; opacity: 0.6; }
+.role-switcher--open .role-switcher__arrow { transform: rotate(180deg); }
+
+.role-switcher__menu {
+  position: absolute; top: calc(100% + 6px); right: 0;
+  min-width: 260px;
+  background: var(--paper); border: 1px solid var(--ink-200);
+  border-radius: 10px;
+  box-shadow: 0 16px 40px rgba(15, 26, 46, 0.16);
+  padding: 6px; z-index: 1000;
+  display: none;
+}
+.role-switcher--open .role-switcher__menu { display: block; }
+.role-switcher__hdr {
+  font-size: 11.5px; color: var(--ink-500); padding: 8px 10px 6px;
+}
+.role-switcher__hdr strong { color: var(--ink-900); font-weight: 700; }
+.role-switcher__sep {
+  height: 1px; background: var(--ink-100); margin: 4px 4px;
+}
+.role-switcher__item {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; padding: 8px 10px; border-radius: 6px;
+  background: transparent; border: 0; cursor: pointer;
+  font-family: inherit; font-size: 12.5px; color: var(--ink-900);
+  text-align: left; text-decoration: none;
+  transition: background 140ms;
+}
+.role-switcher__item:hover { background: var(--tint-3); }
+.role-switcher__item--current {
+  background: var(--ink-100); cursor: default;
+}
+.role-switcher__item--current:hover { background: var(--ink-100); }
+.role-switcher__lbl { flex: 1; }
+
+/* Unified role pill — SUDO brand kit only (no teal/emerald) */
+.role-switcher__pill {
+  font-size: 9.5px; font-weight: 800; padding: 2px 7px;
+  border-radius: 999px; color: white;
+  text-transform: uppercase; letter-spacing: 0.4px;
+  background: linear-gradient(135deg, var(--navy-deep, #173B7A), var(--navy, #204D9B));
+  min-width: 36px; text-align: center;
+}
+.role-switcher__foot {
+  font-size: 10.5px; color: var(--ink-500);
+  padding: 6px 10px 8px;
+  font-style: italic;
+}
+
+
+/* Preview mode — switcher button looks distinct when previewing */
+.role-switcher--previewing .role-switcher__btn {
+  background: linear-gradient(135deg, #FCE9C2, #FDF6E3);
+  border-color: #E89A1E;
+  color: #854F0B;
+}
+.role-switcher--previewing .role-switcher__btn:hover {
+  background: linear-gradient(135deg, #FFEAB0, #FFF5DC);
+  border-color: #C77A00;
+  color: #633806;
+}
+
+/* Back-to-home item */
+.role-switcher__item--back {
+  background: var(--tint-3, #E5F0FB);
+  font-weight: 700;
+}
+.role-switcher__item--back:hover {
+  background: var(--tint-2, #BCD7F2);
+}
+.role-switcher__back-icon {
+  display: inline-flex; color: var(--bright, #189CD9);
+  margin-right: -4px;
+}
+
+/* Pagination row */
+.pager-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 0 4px;
+  margin-top: 8px;
+  border-top: 1px solid var(--ink-100);
+}
+.pager-row__info {
+  font-size: 12px; color: var(--ink-500);
+}
+.pager-row__info strong { color: var(--ink-900); font-weight: 700; }
+.pager {
+  display: inline-flex; gap: 4px; align-items: center;
+}
+.pager__btn {
+  min-width: 32px; height: 32px;
+  border: 1px solid var(--ink-200);
+  background: var(--paper);
+  border-radius: 6px;
+  font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+  color: var(--ink-700);
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0 8px;
+  transition: all 140ms;
+}
+.pager__btn:hover:not(.pager__btn--disabled):not(.pager__btn--active) {
+  border-color: var(--bright);
+  color: var(--bright);
+  background: var(--tint-3);
+}
+.pager__btn--active {
+  background: var(--bright);
+  border-color: var(--bright);
+  color: white;
+  cursor: default;
+}
+.pager__btn--disabled {
+  opacity: 0.4; cursor: not-allowed;
+}
+.pager__ellipsis {
+  padding: 0 6px; color: var(--ink-400); font-size: 13px;
+}
+
+/* ─── Preview banner (persistent, unmissable) ─── */
+.rs-preview-banner {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 9999;
+  background: linear-gradient(90deg, #FCE9C2, #FDF6E3 60%, #FCE9C2);
+  border-bottom: 2px solid #E89A1E;
+  color: #6E4400;
+  font-size: 12.5px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+.rs-preview-banner__inner {
+  max-width: 1600px; margin: 0 auto;
+  display: flex; align-items: center; gap: 14px;
+  padding: 10px 24px;
+}
+.rs-preview-banner__icon {
+  display: inline-flex; color: #C77A00;
+}
+.rs-preview-banner__text {
+  flex: 1; line-height: 1.4;
+}
+.rs-preview-banner__text strong { color: #4D2D00; font-weight: 700; }
+.rs-preview-banner__btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #C77A00; color: white;
+  padding: 6px 12px; border-radius: 6px;
+  font-size: 12px; font-weight: 700;
+  text-decoration: none;
+  border: 1px solid #A85F00;
+  transition: background 140ms;
+  white-space: nowrap;
+}
+.rs-preview-banner__btn:hover { background: #A85F00; color: white; }
+.rs-preview-banner__btn svg { width: 13px; height: 13px; }
+/* Push the page down to make room for the banner */
+body.rs-preview-active { padding-top: 42px; }

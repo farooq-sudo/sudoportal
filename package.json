@@ -1,0 +1,31 @@
+{
+  "name": "sudo-portal",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SUDO Consultants Employee Portal — full stack monorepo (HTML portals + Fastify API + PostgreSQL)",
+  "workspaces": [
+    "apps/api"
+  ],
+  "scripts": {
+    "dev":         "npm --workspace apps/api run dev",
+    "build":       "npm --workspace apps/api run build",
+    "start":       "npm --workspace apps/api run start",
+    "db:generate": "npm --workspace apps/api run db:generate",
+    "db:migrate":  "npm --workspace apps/api run db:migrate",
+    "db:reset":    "npm --workspace apps/api run db:reset",
+    "db:seed":     "npm --workspace apps/api run db:seed",
+    "db:seed:reset":"npm --workspace apps/api run db:seed:reset",
+    "db:studio":   "npm --workspace apps/api run db:studio",
+    "test":        "npm --workspace apps/api run test",
+    "lint":        "npm --workspace apps/api run lint"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm":  ">=10.0.0"
+  },
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url":  "git@github.com:sudoconsultants/sudo-portal.git"
+  }
+}

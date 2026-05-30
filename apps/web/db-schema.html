@@ -1,0 +1,2645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SUDO Portal · Database Schema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink-900: #0F1B2D;
+    --ink-800: #1B2A3F;
+    --ink-700: #334155;
+    --ink-500: #64748B;
+    --ink-300: #CBD5E1;
+    --ink-200: #E2E8F0;
+    --ink-100: #F1F5F9;
+    --ink-50:  #F8FAFC;
+    --paper:   #FBFCFE;
+
+    --navy:      #0F2548;
+    --navy-deep: #061533;
+    --bright:    #2563EB;
+    --teal:      #0891B2;
+    --green:     #15803D;
+    --amber:     #B45309;
+    --red:       #B91C1C;
+    --purple:    #6D28D9;
+    --pink:      #BE185D;
+    --orange:    #C2410C;
+
+    /* Cluster colors */
+    --c-core:        #2563EB;
+    --c-kpi:         #15803D;
+    --c-onboarding:  #B45309;
+    --c-training:    #6D28D9;
+    --c-performance: #BE185D;
+    --c-system:      #475569;
+    --c-integration: #0891B2;
+
+    --font-display: 'Plus Jakarta Sans', sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--paper); color: var(--ink-900); font-family: var(--font-display); }
+
+  /* ─── Header ─────────────────────────────────────────────────── */
+  header {
+    position: sticky; top: 0; z-index: 30;
+    background: var(--navy-deep);
+    color: white;
+    padding: 14px 24px;
+    display: flex; align-items: center; gap: 20px;
+    border-bottom: 1px solid var(--ink-200);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset, 0 4px 14px rgba(15,37,72,0.08);
+  }
+  header .logo {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    color: #C7D8EE;
+    text-transform: uppercase;
+  }
+  header h1 {
+    font-size: 16px;
+    margin: 0;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+  }
+  header .meta {
+    color: #93B0D6;
+    font-size: 12px;
+    font-family: var(--font-mono);
+    margin-left: auto;
+  }
+  header .meta strong { color: white; font-weight: 600; }
+
+  /* ─── Toolbar ─────────────────────────────────────────────────── */
+  .toolbar {
+    position: sticky; top: 50px; z-index: 29;
+    background: white;
+    border-bottom: 1px solid var(--ink-200);
+    padding: 10px 24px;
+    display: flex; gap: 14px; align-items: center; flex-wrap: wrap;
+    font-size: 12px;
+  }
+  .toolbar input[type="search"] {
+    border: 1px solid var(--ink-300);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    width: 200px;
+    background: var(--ink-50);
+  }
+  .toolbar input[type="search"]:focus { outline: 2px solid var(--bright); border-color: var(--bright); background: white; }
+  .legend { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .legend__item {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-700);
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: var(--ink-50);
+    cursor: pointer;
+    transition: all .15s;
+    border: 1px solid transparent;
+  }
+  .legend__item:hover { background: var(--ink-100); border-color: var(--ink-200); }
+  .legend__item--active { background: white; border-color: var(--ink-300); }
+  .legend__swatch {
+    width: 10px; height: 10px; border-radius: 2px;
+  }
+  .toolbar__btn {
+    background: var(--ink-900);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .toolbar__btn:hover { background: var(--bright); }
+  .toolbar__hint {
+    font-size: 11px;
+    color: var(--ink-500);
+    font-family: var(--font-mono);
+    margin-left: auto;
+  }
+
+  /* ─── Canvas ──────────────────────────────────────────────────── */
+  .canvas-wrap {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 50px - 50px);
+    overflow: auto;
+    background:
+      linear-gradient(to right, var(--ink-100) 1px, transparent 1px) 0 0 / 32px 32px,
+      linear-gradient(to bottom, var(--ink-100) 1px, transparent 1px) 0 0 / 32px 32px,
+      radial-gradient(circle at 1px 1px, var(--ink-200) 1px, transparent 1px) 0 0 / 32px 32px,
+      var(--paper);
+  }
+  .canvas {
+    position: relative;
+    width: var(--canvas-w, 2400px);
+    height: var(--canvas-h, 1700px);
+    transform-origin: 0 0;
+    transition: transform .25s;
+  }
+
+  /* ─── Cluster grouping ────────────────────────────────────────── */
+  .cluster {
+    position: absolute;
+    border: 2px dashed var(--ink-300);
+    border-radius: 14px;
+    background: rgba(255,255,255,0.4);
+    backdrop-filter: blur(1px);
+  }
+  .cluster__label {
+    position: absolute;
+    top: -12px; left: 16px;
+    background: var(--paper);
+    padding: 0 10px;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--ink-700);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  .cluster__label::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    margin-right: 6px;
+    vertical-align: 1px;
+    background: var(--c);
+  }
+
+  /* ─── Tables ──────────────────────────────────────────────────── */
+  .table {
+    position: absolute;
+    background: white;
+    border: 1px solid var(--ink-300);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(15,37,72,0.04), 0 6px 16px rgba(15,37,72,0.06);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    overflow: hidden;
+    transition: box-shadow .15s, transform .15s, opacity .2s;
+    cursor: pointer;
+  }
+  .table:hover {
+    box-shadow: 0 4px 8px rgba(15,37,72,0.08), 0 12px 28px rgba(15,37,72,0.12);
+    transform: translateY(-1px);
+    z-index: 5;
+  }
+  .table--highlight {
+    box-shadow: 0 0 0 3px var(--bright), 0 12px 28px rgba(37,99,235,0.25) !important;
+    z-index: 10;
+  }
+  .table--connected {
+    box-shadow: 0 0 0 2px var(--teal), 0 6px 16px rgba(8,145,178,0.18) !important;
+    z-index: 8;
+  }
+  .table--dimmed {
+    opacity: 0.22;
+  }
+  .table__head {
+    background: var(--c, var(--navy));
+    color: white;
+    padding: 7px 11px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 12.5px;
+  }
+  .table__head-icon {
+    font-size: 10px;
+    opacity: 0.7;
+    font-family: var(--font-mono);
+    font-weight: 500;
+  }
+  .table__body {
+    padding: 0;
+  }
+  .table__field {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 4px 11px;
+    border-bottom: 1px solid var(--ink-100);
+    gap: 8px;
+  }
+  .table__field:last-child { border-bottom: none; }
+  .table__fname { color: var(--ink-900); font-weight: 500; }
+  .table__fname--pk { color: var(--bright); font-weight: 700; }
+  .table__fname--fk { color: var(--teal); }
+  .table__fname--unique { color: var(--purple); }
+  .table__ftype { color: var(--ink-500); font-size: 10px; }
+  .table__pk-icon {
+    display: inline-block;
+    width: 10px; text-align: center;
+    margin-right: 4px;
+    font-weight: 900;
+    color: var(--amber);
+  }
+  .table__fk-icon {
+    display: inline-block;
+    width: 10px; text-align: center;
+    margin-right: 4px;
+    color: var(--teal);
+  }
+  .table__more {
+    padding: 5px 11px;
+    background: var(--ink-50);
+    color: var(--ink-500);
+    font-size: 10px;
+    text-align: center;
+    border-top: 1px solid var(--ink-100);
+    cursor: pointer;
+  }
+  .table__more:hover { background: var(--ink-100); color: var(--ink-900); }
+
+  /* ─── Relationship lines (SVG overlay) ─────────────────────────── */
+  .lines {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .lines path {
+    fill: none;
+    stroke: var(--ink-300);
+    stroke-width: 1.5;
+    transition: stroke .15s, stroke-width .15s, opacity .2s;
+  }
+  .lines path.line--highlight {
+    stroke: var(--bright);
+    stroke-width: 2.5;
+    z-index: 9;
+  }
+  .lines path.line--dimmed { opacity: 0.18; }
+
+  /* ─── Detail drawer ────────────────────────────────────────────── */
+  .drawer {
+    position: fixed;
+    top: 50px; right: -480px;
+    width: 460px;
+    height: calc(100vh - 50px);
+    background: white;
+    box-shadow: -10px 0 30px rgba(15,37,72,0.12);
+    z-index: 40;
+    transition: right .3s cubic-bezier(.4,0,.2,1);
+    overflow-y: auto;
+    border-left: 1px solid var(--ink-200);
+  }
+  .drawer--open { right: 0; }
+  .drawer__head {
+    padding: 18px 22px 14px;
+    border-bottom: 1px solid var(--ink-200);
+    background: var(--c, var(--navy-deep));
+    color: white;
+    position: sticky; top: 0;
+  }
+  .drawer__title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    letter-spacing: -0.2px;
+  }
+  .drawer__subtitle {
+    margin: 4px 0 0;
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.75);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    font-weight: 600;
+  }
+  .drawer__close {
+    position: absolute; top: 14px; right: 14px;
+    background: rgba(255,255,255,0.1);
+    color: white; border: none;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    cursor: pointer; font-size: 16px;
+    display: grid; place-items: center;
+  }
+  .drawer__close:hover { background: rgba(255,255,255,0.2); }
+  .drawer__body { padding: 18px 22px; }
+  .drawer__section { margin-bottom: 20px; }
+  .drawer__section-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--ink-500);
+    font-weight: 700;
+    margin: 0 0 8px;
+  }
+  .drawer__desc {
+    font-size: 13px;
+    color: var(--ink-700);
+    line-height: 1.55;
+    margin: 0;
+  }
+  .drawer__field {
+    display: grid; grid-template-columns: 1fr auto;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--ink-100);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    gap: 8px;
+    align-items: center;
+  }
+  .drawer__field:last-child { border-bottom: none; }
+  .drawer__field-name { color: var(--ink-900); }
+  .drawer__field-name--pk { color: var(--bright); font-weight: 700; }
+  .drawer__field-name--fk { color: var(--teal); }
+  .drawer__field-name--unique { color: var(--purple); }
+  .drawer__field-type { color: var(--ink-500); font-size: 11px; }
+  .drawer__field-badge {
+    display: inline-block;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 5px;
+    vertical-align: 1px;
+  }
+  .drawer__field-badge--pk { background: #DBEAFE; color: var(--bright); }
+  .drawer__field-badge--fk { background: #CFFAFE; color: var(--teal); }
+  .drawer__field-badge--unique { background: #EDE9FE; color: var(--purple); }
+  .drawer__field-badge--idx { background: #FEF3C7; color: var(--amber); }
+  .drawer__rel {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--ink-100);
+    font-size: 12.5px;
+  }
+  .drawer__rel:last-child { border-bottom: none; }
+  .drawer__rel-target {
+    font-family: var(--font-mono);
+    color: var(--bright);
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .drawer__rel-target:hover { text-decoration: underline; }
+  .drawer__rel-kind {
+    color: var(--ink-500);
+    font-size: 10.5px;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ─── Print / responsive ──────────────────────────────────────── */
+  @media (max-width: 700px) {
+    .toolbar { padding: 8px 12px; gap: 8px; }
+    .toolbar input[type="search"] { width: 100%; }
+    .drawer { width: 100%; right: -100%; }
+    header { padding: 10px 14px; gap: 10px; }
+    header h1 { font-size: 13px; }
+    header .meta { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="logo">SUDO</span>
+  <h1>Portal · Database Schema</h1>
+  <span class="meta"><strong>73</strong> tables · <strong>21</strong> clusters · PostgreSQL 16 / Prisma 5</span>
+</header>
+
+<div class="toolbar">
+  <input type="search" id="search" placeholder="Search tables or fields…" />
+  <div class="legend" id="legend"></div>
+  <span class="toolbar__hint">Click a table to inspect · click again to deselect</span>
+  <button class="toolbar__btn" id="reset">Reset view</button>
+</div>
+
+<div class="canvas-wrap" id="canvasWrap">
+  <div class="canvas" id="canvas">
+    <svg class="lines" id="lines" viewBox="0 0 2400 1700" preserveAspectRatio="none"></svg>
+  </div>
+</div>
+
+<aside class="drawer" id="drawer">
+  <div class="drawer__head" id="drawerHead">
+    <h2 class="drawer__title" id="drawerTitle">—</h2>
+    <p class="drawer__subtitle" id="drawerSubtitle">—</p>
+    <button class="drawer__close" id="drawerClose" aria-label="Close">×</button>
+  </div>
+  <div class="drawer__body" id="drawerBody"></div>
+</aside>
+
+<script>
+// ────────────────────────────────────────────────────────────────────────────
+//  Schema definition — extracted from apps/api/prisma/schema.prisma
+// ────────────────────────────────────────────────────────────────────────────
+
+// Auto-generated from schema.prisma — 73 models, 21 clusters
+// Canvas: 1248px × 7956px
+
+const CLUSTERS = {
+  "identity": {
+    "label": "Identity & Org",
+    "color": "#2563EB"
+  },
+  "compensation": {
+    "label": "Compensation",
+    "color": "#059669"
+  },
+  "family": {
+    "label": "Family & Insurance",
+    "color": "#0E7490"
+  },
+  "documents": {
+    "label": "Documents",
+    "color": "#7C3AED"
+  },
+  "leave": {
+    "label": "Leave Management",
+    "color": "#DB2777"
+  },
+  "kpi": {
+    "label": "KPI Management",
+    "color": "#15803D"
+  },
+  "onboarding": {
+    "label": "Onboarding",
+    "color": "#B45309"
+  },
+  "training": {
+    "label": "Training & Certs",
+    "color": "#6D28D9"
+  },
+  "projects": {
+    "label": "Projects & Timesheets",
+    "color": "#0F766E"
+  },
+  "performance": {
+    "label": "Performance",
+    "color": "#BE185D"
+  },
+  "badges": {
+    "label": "Badges",
+    "color": "#EA580C"
+  },
+  "requests": {
+    "label": "Requests & Travel",
+    "color": "#7E22CE"
+  },
+  "perms": {
+    "label": "Permissions",
+    "color": "#1E40AF"
+  },
+  "system": {
+    "label": "System & Ops",
+    "color": "#475569"
+  },
+  "security": {
+    "label": "Security",
+    "color": "#92400E"
+  },
+  "integration": {
+    "label": "Integrations",
+    "color": "#0369A1"
+  },
+  "exports": {
+    "label": "Export & Backups",
+    "color": "#525252"
+  },
+  "calendar": {
+    "label": "Holiday Calendar",
+    "color": "#0284C7"
+  },
+  "assets": {
+    "label": "IT Assets",
+    "color": "#9333EA"
+  },
+  "comms": {
+    "label": "Comms & Comments",
+    "color": "#0D9488"
+  },
+  "loginlog": {
+    "label": "Login Attempts",
+    "color": "#7F1D1D"
+  }
+};
+
+const CANVAS_W = 1248;
+const CANVAS_H = 7956;
+
+const TABLES = {
+  AirTicketAllowance: {
+    cluster: "requests", x: 624, y: 4304, w: 250,
+    desc: "Annual entitlement for an employee — round-trips per year, tickets per cycle, cabin class, home route, family coverage flag, amount cap.",
+    fields: [
+      { n: "empId", t: "String", pk: true },
+      { n: "cyclePerYear", t: "Int" },
+      { n: "ticketsPerCycle", t: "Int" },
+      { n: "cabinClass", t: "String" },
+      { n: "homeRoute", t: "String?" },
+      { n: "coversFamily", t: "Boolean" },
+      { n: "amountCap", t: "Decimal?" },
+      { n: "currency", t: "String?" },
+      { n: "policyNote", t: "String?" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" }
+    ],
+  },
+  AirTicketUsage: {
+    cluster: "requests", x: 906, y: 4304, w: 250,
+    desc: "Each actual use of the air ticket allowance. Travel dates, route, amount, links to a reimbursement Request when applicable.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "empId", t: "String", fk: "Employee" },
+      { n: "year", t: "Int" },
+      { n: "travelFrom", t: "DateTime" },
+      { n: "travelTo", t: "DateTime" },
+      { n: "route", t: "String" },
+      { n: "amount", t: "Decimal?" },
+      { n: "currency", t: "String?" },
+      { n: "reimbursementRequestId", t: "String?" },
+      { n: "status", t: "String" },
+      { n: "notes", t: "String?" },
+      { n: "createdAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" }
+    ],
+  },
+  AllowanceItem: {
+    cluster: "compensation", x: 342, y: 648, w: 250,
+    desc: "Line items of a salary record (e.g. 'Telecom: 200 AED'). Lets payroll itemise allowances rather than collapsing into 'other'.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "salaryRecordId", t: "String" },
+      { n: "name", t: "String" },
+      { n: "amount", t: "Decimal" },
+      { n: "taxable", t: "Boolean" },
+      { n: "recurring", t: "Boolean" },
+      { n: "notes", t: "String?" }
+    ],
+    rels: [
+      { to: "SalaryRecord", kind: "→" }
+    ],
+  },
+  Announcement: {
+    cluster: "comms", x: 60, y: 7296, w: 250,
+    desc: "Company news, policy updates, alerts. Targets ALL/TEAM/DEPARTMENT/ROLE/CUSTOM audiences. Optional acknowledgement requirement, banner image, attachments, expiry.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "title", t: "String" },
+      { n: "body", t: "String" },
+      { n: "category", t: "AnnouncementCategory" },
+      { n: "authorEmpId", t: "String" },
+      { n: "publishedAt", t: "DateTime?" },
+      { n: "expiresAt", t: "DateTime?" },
+      { n: "pinned", t: "Boolean" },
+      { n: "audience", t: "String" },
+      { n: "audienceDepartmentId", t: "String?" },
+      { n: "audienceTeamId", t: "String?" },
+      { n: "audienceRoles", t: "Role[]" },
+      { n: "audienceEmpIds", t: "String[]" },
+      { n: "requireAcknowledgement", t: "Boolean" },
+      { n: "attachmentUrls", t: "String[]" },
+      { n: "bannerImageUrl", t: "String?" },
+      { n: "color", t: "String?" },
+      { n: "viewCount", t: "Int" },
+      { n: "active", t: "Boolean" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "AnnouncementAcknowledgement", kind: "→" }
+    ],
+  },
+  AnnouncementAcknowledgement: {
+    cluster: "comms", x: 342, y: 7296, w: 250,
+    desc: "Per-employee record that they acknowledged a required announcement. Captures IP and timestamp.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "announcementId", t: "String" },
+      { n: "empId", t: "String" },
+      { n: "acknowledgedAt", t: "DateTime" },
+      { n: "ipAddress", t: "String?" }
+    ],
+    rels: [
+      { to: "Announcement", kind: "→" }
+    ],
+  },
+  ApiKey: {
+    cluster: "security", x: 624, y: 5746, w: 250,
+    desc: "Service-to-service tokens (CI, internal microservices). Hashed at rest (sha256). Scoped permissions, expiry, revocation.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "name", t: "String" },
+      { n: "keyHash", t: "String", unique: true },
+      { n: "scope", t: "String[]" },
+      { n: "createdBy", t: "String?" },
+      { n: "expiresAt", t: "DateTime?" },
+      { n: "revokedAt", t: "DateTime?" },
+      { n: "lastUsedAt", t: "DateTime?" },
+      { n: "active", t: "Boolean" },
+      { n: "createdAt", t: "DateTime" }
+    ],
+    rels: [
+
+    ],
+  },
+  Asset: {
+    cluster: "assets", x: 60, y: 6986, w: 250,
+    desc: "IT-issued asset (laptop, monitor, phone, etc.). Brand/model/serial/asset tag, purchase metadata, warranty, current status. Status moves AVAILABLE → ASSIGNED → AVAILABLE (or IN_REPAIR/RETIRED/LOST).",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "category", t: "AssetCategory" },
+      { n: "brand", t: "String?" },
+      { n: "model", t: "String?" },
+      { n: "serialNumber", t: "String?", unique: true },
+      { n: "assetTag", t: "String?", unique: true },
+      { n: "purchaseDate", t: "DateTime?" },
+      { n: "purchasePrice", t: "Decimal?" },
+      { n: "currency", t: "String?" },
+      { n: "warrantyUntil", t: "DateTime?" },
+      { n: "supplier", t: "String?" },
+      { n: "location", t: "String?" },
+      { n: "status", t: "AssetStatus" },
+      { n: "specifications", t: "Json?" },
+      { n: "notes", t: "String?" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" },
+      { n: "deletedAt", t: "DateTime?" }
+    ],
+    rels: [
+      { to: "AssetAssignment", kind: "→" }
+    ],
+  },
+  AssetAssignment: {
+    cluster: "assets", x: 342, y: 6986, w: 250,
+    desc: "Each time an asset is given to an employee. Tracks assignment date, return date, condition on return, and the sha256 hash of the signed handover form.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "assetId", t: "String" },
+      { n: "empId", t: "String" },
+      { n: "assignedAt", t: "DateTime" },
+      { n: "returnedAt", t: "DateTime?" },
+      { n: "returnCondition", t: "String?" },
+      { n: "returnNotes", t: "String?" },
+      { n: "assignedBy", t: "String?" },
+      { n: "receivedBy", t: "String?" },
+      { n: "active", t: "Boolean" },
+      { n: "acknowledgementSignedAt", t: "DateTime?" },
+      { n: "acknowledgementSignedHash", t: "String?" }
+    ],
+    rels: [
+      { to: "Asset", kind: "→" }
+    ],
+  },
+  AuditLog: {
+    cluster: "system", x: 60, y: 5158, w: 250,
+    desc: "Append-only log of every mutation. Captures actor (id, name, roles, IP, user-agent), action, target, category, severity, and a before/after metadata JSON. NEVER updated or deleted.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "actorId", t: "String?", fk: "Employee" },
+      { n: "actorName", t: "String" },
+      { n: "actorRoles", t: "Role[]" },
+      { n: "actorIpAddress", t: "String?" },
+      { n: "actorUserAgent", t: "String?" },
+      { n: "action", t: "String" },
+      { n: "category", t: "String?" },
+      { n: "target", t: "String?" },
+      { n: "targetType", t: "String?" },
+      { n: "note", t: "String?" },
+      { n: "metadata", t: "Json?" },
+      { n: "severity", t: "String" },
+      { n: "createdAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" }
+    ],
+  },
+  BackgroundCheck: {
+    cluster: "onboarding", x: 624, y: 2476, w: 250,
+    desc: "Pre-employment checks: identity, criminal, employment verification, education verification, credit, references, drug screen. Vendor-integrated (Sterling, HireRight). Holds vendor ref, status, result URL.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "empId", t: "String" },
+      { n: "type", t: "BackgroundCheckType" },
+      { n: "status", t: "BackgroundCheckStatus" },
+      { n: "vendor", t: "String?" },
+      { n: "vendorRefId", t: "String?" },
+      { n: "requestedAt", t: "DateTime" },
+      { n: "completedAt", t: "DateTime?" },
+      { n: "result", t: "String?" },
+      { n: "resultUrl", t: "String?" },
+      { n: "notes", t: "String?" },
+      { n: "cost", t: "Decimal?" },
+      { n: "currency", t: "String?" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" }
+    ],
+  },
+  BackupRecord: {
+    cluster: "exports", x: 342, y: 6366, w: 250,
+    desc: "Catalog of backups (automated daily, manual, pre-migration). Displayed in Admin's Backups page. Storage ref, size, retention, status, trigger.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "type", t: "String" },
+      { n: "storageRef", t: "String" },
+      { n: "sizeBytes", t: "BigInt?" },
+      { n: "status", t: "String" },
+      { n: "retentionDays", t: "Int" },
+      { n: "startedAt", t: "DateTime" },
+      { n: "finishedAt", t: "DateTime?" },
+      { n: "errorMessage", t: "String?" },
+      { n: "triggeredBy", t: "String?" }
+    ],
+    rels: [
+
+    ],
+  },
+  Badge: {
+    cluster: "badges", x: 60, y: 3994, w: 250,
+    desc: "Catalog of recognition badges (Rising Star, Innovator, Customer Hero, etc). Holds icon, color, rarity, point value, and which roles can grant it.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "name", t: "String" },
+      { n: "description", t: "String?" },
+      { n: "icon", t: "String?" },
+      { n: "color", t: "String?" },
+      { n: "rarity", t: "String?" },
+      { n: "points", t: "Int" },
+      { n: "grantableByRoles", t: "Role[]" },
+      { n: "autoTriggerJson", t: "Json?" },
+      { n: "active", t: "Boolean" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "BadgeAward", kind: "→" }
+    ],
+  },
+  BadgeAward: {
+    cluster: "badges", x: 342, y: 3994, w: 250,
+    desc: "Specific badge granted to a specific employee. Join table with award metadata (who awarded, reason, public/private).",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "empId", t: "String", fk: "Employee" },
+      { n: "badgeId", t: "String", fk: "Badge" },
+      { n: "awardedBy", t: "String?" },
+      { n: "reason", t: "String?" },
+      { n: "isPublic", t: "Boolean" },
+      { n: "awardedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Badge", kind: "→" },
+      { to: "Employee", kind: "→" }
+    ],
+  },
+  BankAccount: {
+    cluster: "compensation", x: 906, y: 648, w: 250,
+    desc: "Employee's bank account(s) for salary credit. Holder name, IBAN, SWIFT/BIC, currency. Supports primary + secondary accounts with verification status.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "empId", t: "String" },
+      { n: "bankName", t: "String" },
+      { n: "branchName", t: "String?" },
+      { n: "accountHolder", t: "String" },
+      { n: "accountNumber", t: "String?" },
+      { n: "iban", t: "String?" },
+      { n: "swiftBic", t: "String?" },
+      { n: "currency", t: "String" },
+      { n: "isPrimary", t: "Boolean" },
+      { n: "verified", t: "Boolean" },
+      { n: "verifiedBy", t: "String?" },
+      { n: "verifiedAt", t: "DateTime?" },
+      { n: "active", t: "Boolean" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" }
+    ],
+  },
+  Certification: {
+    cluster: "training", x: 906, y: 2786, w: 250,
+    desc: "External certifications earned (AWS, Azure, PMP). Synced from training assignments when applicable; can also be added directly. Tracks issuer, level, credentialId, verifyUrl, expiry, reimbursement.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "empId", t: "String", fk: "Employee" },
+      { n: "name", t: "String" },
+      { n: "issuer", t: "String?" },
+      { n: "category", t: "String?" },
+      { n: "level", t: "String?" },
+      { n: "issuedAt", t: "DateTime?" },
+      { n: "expiresAt", t: "DateTime?" },
+      { n: "credentialId", t: "String?" },
+      { n: "verifyUrl", t: "String?" },
+      { n: "evidenceUrl", t: "String?" },
+      { n: "verifiedBy", t: "String?" },
+      { n: "verifiedAt", t: "DateTime?" },
+      { n: "cost", t: "Decimal?" },
+      { n: "currency", t: "String?" },
+      { n: "reimbursed", t: "Boolean" },
+      { n: "reimbursedAt", t: "DateTime?" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" }
+    ],
+  },
+  Comment: {
+    cluster: "comms", x: 624, y: 7296, w: 250,
+    desc: "Polymorphic comment thread — attachable to KPI assignments, requests, documents, feedback sessions. Supports threading, @mentions, pinning, private/HR-only visibility.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "entityType", t: "String" },
+      { n: "entityId", t: "String" },
+      { n: "authorEmpId", t: "String" },
+      { n: "body", t: "String" },
+      { n: "mentionedEmpIds", t: "String[]" },
+      { n: "parentCommentId", t: "String?", fk: "Comment" },
+      { n: "isPrivate", t: "Boolean" },
+      { n: "editedAt", t: "DateTime?" },
+      { n: "pinned", t: "Boolean" },
+      { n: "attachmentUrls", t: "String[]" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" },
+      { n: "deletedAt", t: "DateTime?" }
+    ],
+    rels: [
+      { to: "Comment", kind: "→" }
+    ],
+  },
+  DataExport: {
+    cluster: "exports", x: 60, y: 6366, w: 250,
+    desc: "User-initiated data exports. Captures requester, scope (employees/kpis/audit_log/full_tenant), format (CSV/XLSX/JSON/PDF), filters, status, signed file URL, expiry.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "requestedBy", t: "String", fk: "Employee" },
+      { n: "scope", t: "DataExportScope" },
+      { n: "format", t: "DataExportFormat" },
+      { n: "filtersJson", t: "Json?" },
+      { n: "includeFieldsJson", t: "Json?" },
+      { n: "status", t: "DataExportStatus" },
+      { n: "fileUrl", t: "String?" },
+      { n: "fileSizeBytes", t: "Int?" },
+      { n: "rowCount", t: "Int?" },
+      { n: "startedAt", t: "DateTime?" },
+      { n: "completedAt", t: "DateTime?" },
+      { n: "expiresAt", t: "DateTime?" },
+      { n: "downloadedAt", t: "DateTime?" },
+      { n: "errorMessage", t: "String?" },
+      { n: "createdAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" }
+    ],
+  },
+  Department: {
+    cluster: "identity", x: 60, y: 60, w: 250,
+    desc: "High-level org grouping (Cloud Engineering, Advisory, People Operations). Supports hierarchy via parentId and ties to a cost centre.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "name", t: "String", unique: true },
+      { n: "code", t: "String", unique: true },
+      { n: "description", t: "String?" },
+      { n: "parentId", t: "String?", fk: "Department" },
+      { n: "headEmpId", t: "String?" },
+      { n: "costCenter", t: "String?" },
+      { n: "active", t: "Boolean" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Department", kind: "→" },
+      { to: "Employee", kind: "→" },
+      { to: "Team", kind: "→" }
+    ],
+  },
+  Document: {
+    cluster: "documents", x: 60, y: 1268, w: 250,
+    desc: "Centralised document store — offer letters, contracts, passport scans, training certs, NDAs, payslips. Files live in S3/Azure Blob; this row holds metadata, status, expiry, version history.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "empId", t: "String?", fk: "Employee" },
+      { n: "category", t: "DocumentCategory" },
+      { n: "title", t: "String" },
+      { n: "description", t: "String?" },
+      { n: "fileUrl", t: "String" },
+      { n: "storageKey", t: "String?" },
+      { n: "fileName", t: "String?" },
+      { n: "mimeType", t: "String?" },
+      { n: "sizeBytes", t: "Int?" },
+      { n: "status", t: "DocumentStatus" },
+      { n: "effectiveDate", t: "DateTime?" },
+      { n: "expiresAt", t: "DateTime?" },
+      { n: "isConfidential", t: "Boolean" },
+      { n: "uploadedBy", t: "String?" },
+      { n: "reviewedBy", t: "String?" },
+      { n: "reviewedAt", t: "DateTime?" },
+      { n: "versionNumber", t: "Int" },
+      { n: "parentDocumentId", t: "String?", fk: "Document" },
+      { n: "tags", t: "String[]" },
+      { n: "metadataJson", t: "Json?" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" },
+      { n: "deletedAt", t: "DateTime?" }
+    ],
+    rels: [
+      { to: "Document", kind: "→" },
+      { to: "DocumentSignature", kind: "→" },
+      { to: "Employee", kind: "→" }
+    ],
+  },
+  DocumentSignature: {
+    cluster: "documents", x: 342, y: 1268, w: 250,
+    desc: "E-signature record for SIGNED documents. Captures signer, timestamp, method (typed/drawn/DocuSign/Microsoft), IP, user agent, and a sha256 hash of the signed document (proves the signed copy).",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "documentId", t: "String" },
+      { n: "signerEmpId", t: "String", fk: "Employee" },
+      { n: "signedAt", t: "DateTime" },
+      { n: "method", t: "String" },
+      { n: "ipAddress", t: "String?" },
+      { n: "userAgent", t: "String?" },
+      { n: "documentHashAtSigning", t: "String" },
+      { n: "signatureBlob", t: "String?" },
+      { n: "reference", t: "String?" },
+      { n: "createdAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Document", kind: "→" },
+      { to: "Employee", kind: "→" }
+    ],
+  },
+  Employee: {
+    cluster: "identity", x: 906, y: 60, w: 250,
+    desc: "Primary identity record. Operational data only — PII separated into EmployeeProfile so we can apply stricter RLS to PII. Holds multi-valued roles, team, status, photo URL.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "entraObjectId", t: "String?", unique: true },
+      { n: "email", t: "String", unique: true },
+      { n: "workEmail", t: "String?", unique: true },
+      { n: "name", t: "String" },
+      { n: "preferredName", t: "String?" },
+      { n: "positionId", t: "String?", fk: "Position" },
+      { n: "title", t: "String?" },
+      { n: "departmentId", t: "String?", fk: "Department" },
+      { n: "teamId", t: "String?", fk: "Team" },
+      { n: "teamRole", t: "TeamRole?" },
+      { n: "managerEmpId", t: "String?", fk: "Employee" },
+      { n: "pmEmpId", t: "String?" },
+      { n: "status", t: "EmployeeStatus" },
+      { n: "employmentType", t: "EmploymentType" },
+      { n: "roles", t: "Role[]" },
+      { n: "joinedAt", t: "DateTime?" },
+      { n: "confirmedAt", t: "DateTime?" },
+      { n: "probationEnd", t: "DateTime?" },
+      { n: "workLocation", t: "String?" },
+      { n: "workScheduleJson", t: "Json?" },
+      { n: "photoUrl", t: "String?" },
+      { n: "active", t: "Boolean" },
+      { n: "deletedAt", t: "DateTime?" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" },
+      { n: "createdBy", t: "String?" },
+      { n: "updatedBy", t: "String?" }
+    ],
+    rels: [
+      { to: "AirTicketAllowance", kind: "→" },
+      { to: "AirTicketUsage", kind: "→" },
+      { to: "AuditLog", kind: "→" },
+      { to: "BackgroundCheck", kind: "→" },
+      { to: "BadgeAward", kind: "→" },
+      { to: "BankAccount", kind: "→" },
+      { to: "Certification", kind: "→" },
+      { to: "DataExport", kind: "→" },
+      { to: "Department", kind: "→" },
+      { to: "Document", kind: "→" },
+      { to: "DocumentSignature", kind: "→" },
+      { to: "Employee", kind: "→" },
+      { to: "EmployeeProfile", kind: "→" },
+      { to: "EmploymentRecord", kind: "→" },
+      { to: "EntraIdentity", kind: "→" },
+      { to: "FamilyMember", kind: "→" },
+      { to: "FeedbackSession", kind: "→" },
+      { to: "InsurancePolicy", kind: "→" },
+      { to: "KpiAcknowledgement", kind: "→" },
+      { to: "KpiAssignment", kind: "→" },
+      { to: "KpiCycleHistory", kind: "→" },
+      { to: "LeaveApproval", kind: "→" },
+      { to: "LeaveBalance", kind: "→" },
+      { to: "LeaveRequest", kind: "→" },
+      { to: "MfaDevice", kind: "→" },
+      { to: "Notification", kind: "→" },
+      { to: "OffboardingCase", kind: "→" },
+      { to: "OnboardingPlan", kind: "→" },
+      { to: "OnboardingStep", kind: "→" },
+      { to: "OneOnOneNote", kind: "→" },
+      { to: "Position", kind: "→" },
+      { to: "ProbationCase", kind: "→" },
+      { to: "ProjectAssignment", kind: "→" },
+      { to: "ProjectRating", kind: "→" },
+      { to: "Recognition", kind: "→" },
+      { to: "Request", kind: "→" },
+      { to: "RequestApproval", kind: "→" },
+      { to: "SalaryRecord", kind: "→" },
+      { to: "Team", kind: "→" },
+      { to: "Timesheet", kind: "→" },
+      { to: "TrainingAssignment", kind: "→" },
+      { to: "TrainingCompletion", kind: "→" },
+      { to: "UserSession", kind: "→" }
+    ],
+  },
+  EmployeeProfile: {
+    cluster: "identity", x: 60, y: 338, w: 250,
+    desc: "1:1 with Employee. Houses all PII: legal name (English+Arabic), DOB, gender, nationality, passport/Emirates ID/visa/work permit numbers + expiries, education, emergency contact, personal address. Tighter access control applies.",
+    fields: [
+      { n: "empId", t: "String", pk: true },
+      { n: "fullNameLegal", t: "String?" },
+      { n: "fullNameAr", t: "String?" },
+      { n: "dateOfBirth", t: "DateTime?" },
+      { n: "gender", t: "Gender?" },
+      { n: "nationality", t: "String?" },
+      { n: "secondNationality", t: "String?" },
+      { n: "maritalStatus", t: "MaritalStatus?" },
+      { n: "religion", t: "String?" },
+      { n: "languages", t: "String[]" },
+      { n: "bloodType", t: "String?" },
+      { n: "personalEmail", t: "String?" },
+      { n: "personalPhone", t: "String?" },
+      { n: "alternatePhone", t: "String?" },
+      { n: "addressLine1", t: "String?" },
+      { n: "addressLine2", t: "String?" },
+      { n: "city", t: "String?" },
+      { n: "state", t: "String?" },
+      { n: "postalCode", t: "String?" },
+      { n: "country", t: "String?" },
+      { n: "emergencyContactName", t: "String?" },
+      { n: "emergencyContactRelation", t: "String?" },
+      { n: "emergencyContactPhone", t: "String?" },
+      { n: "emergencyContactEmail", t: "String?" },
+      { n: "passportNumber", t: "String?" },
+      { n: "passportExpiry", t: "DateTime?" },
+      { n: "passportCountry", t: "String?" },
+      { n: "emiratesId", t: "String?" },
+      { n: "emiratesIdExpiry", t: "DateTime?" },
+      { n: "visaNumber", t: "String?" },
+      { n: "visaType", t: "String?" },
+      { n: "visaExpiry", t: "DateTime?" },
+      { n: "visaSponsorEntity", t: "String?" },
+      { n: "workPermitNumber", t: "String?" },
+      { n: "workPermitExpiry", t: "DateTime?" },
+      { n: "drivingLicenseNumber", t: "String?" },
+      { n: "drivingLicenseExpiry", t: "DateTime?" },
+      { n: "highestEducation", t: "String?" },
+      { n: "university", t: "String?" },
+      { n: "graduationYear", t: "Int?" },
+      { n: "notes", t: "String?" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" }
+    ],
+  },
+  EmploymentRecord: {
+    cluster: "identity", x: 624, y: 338, w: 250,
+    desc: "Append-only history of org changes — every promotion, transfer, manager change creates a new row. Latest row = current state; earlier rows preserve history.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "empId", t: "String" },
+      { n: "effectiveDate", t: "DateTime" },
+      { n: "endDate", t: "DateTime?" },
+      { n: "reasonCode", t: "String?" },
+      { n: "reasonNote", t: "String?" },
+      { n: "positionId", t: "String?" },
+      { n: "title", t: "String?" },
+      { n: "departmentId", t: "String?" },
+      { n: "teamId", t: "String?" },
+      { n: "teamRole", t: "TeamRole?" },
+      { n: "employmentType", t: "EmploymentType?" },
+      { n: "managerEmpId", t: "String?" },
+      { n: "workLocation", t: "String?" },
+      { n: "approvedBy", t: "String?" },
+      { n: "approvedAt", t: "DateTime?" },
+      { n: "createdAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" }
+    ],
+  },
+  EntraIdentity: {
+    cluster: "identity", x: 342, y: 338, w: 250,
+    desc: "Cached Microsoft Entra metadata for each linked employee. Updated on every sign-in. groupIdsJson holds the snapshot of Entra group memberships used to derive SUDO roles.",
+    fields: [
+      { n: "empId", t: "String", pk: true },
+      { n: "entraObjectId", t: "String", unique: true },
+      { n: "homeTenantId", t: "String?" },
+      { n: "upn", t: "String?" },
+      { n: "preferredUsername", t: "String?" },
+      { n: "lastSignInAt", t: "DateTime?" },
+      { n: "lastSignInIp", t: "String?" },
+      { n: "tokenCacheRef", t: "String?" },
+      { n: "groupIdsJson", t: "Json?" },
+      { n: "rawProfileJson", t: "Json?" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" }
+    ],
+  },
+  FamilyMember: {
+    cluster: "family", x: 60, y: 958, w: 250,
+    desc: "Spouse, children, dependents. Drives insurance dependents, visa dependents, family air tickets. Carries passport/visa data for each family member.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "empId", t: "String" },
+      { n: "relation", t: "String" },
+      { n: "fullName", t: "String" },
+      { n: "dateOfBirth", t: "DateTime?" },
+      { n: "gender", t: "Gender?" },
+      { n: "nationality", t: "String?" },
+      { n: "passportNumber", t: "String?" },
+      { n: "passportExpiry", t: "DateTime?" },
+      { n: "visaNumber", t: "String?" },
+      { n: "visaExpiry", t: "DateTime?" },
+      { n: "isInsured", t: "Boolean" },
+      { n: "isVisaDependent", t: "Boolean" },
+      { n: "notes", t: "String?" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" },
+      { n: "deletedAt", t: "DateTime?" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" },
+      { to: "InsuranceDependent", kind: "→" }
+    ],
+  },
+  FeedbackSession: {
+    cluster: "performance", x: 624, y: 3406, w: 250,
+    desc: "1:1, skip-level, peer feedback meetings. Synced to M365 calendar (m365EventId). Holds agenda, outcome summary (employee-visible), and private notes (manager-only).",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "empId", t: "String", fk: "Employee" },
+      { n: "managerEmpId", t: "String", fk: "Employee" },
+      { n: "kind", t: "FeedbackSessionKind" },
+      { n: "scheduledAt", t: "DateTime" },
+      { n: "durationMin", t: "Int" },
+      { n: "status", t: "FeedbackSessionStatus" },
+      { n: "m365EventId", t: "String?" },
+      { n: "teamsJoinUrl", t: "String?" },
+      { n: "location", t: "String?" },
+      { n: "agenda", t: "String?" },
+      { n: "outcomeSummary", t: "String?" },
+      { n: "privateNotes", t: "String?" },
+      { n: "completedAt", t: "DateTime?" },
+      { n: "cancelledReason", t: "String?" },
+      { n: "followUpDate", t: "DateTime?" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" },
+      { to: "OneOnOneNote", kind: "→" }
+    ],
+  },
+  Holiday: {
+    cluster: "calendar", x: 60, y: 6676, w: 250,
+    desc: "Public holiday calendar entries — drives leave-day calculation and the 'next holiday' widget. Country/region/religion filters; supports multi-day holidays.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "name", t: "String" },
+      { n: "nameAr", t: "String?" },
+      { n: "date", t: "DateTime" },
+      { n: "endDate", t: "DateTime?" },
+      { n: "country", t: "String" },
+      { n: "region", t: "String?" },
+      { n: "religion", t: "String?" },
+      { n: "category", t: "String" },
+      { n: "isPaid", t: "Boolean" },
+      { n: "isObservance", t: "Boolean" },
+      { n: "recurring", t: "Boolean" },
+      { n: "notes", t: "String?" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+
+    ],
+  },
+  InsuranceDependent: {
+    cluster: "family", x: 624, y: 958, w: 250,
+    desc: "Many-to-many join between an InsurancePolicy and a FamilyMember, with policy-specific metadata (this dependent's card number on this policy, their tier).",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "policyId", t: "String" },
+      { n: "familyMemberId", t: "String" },
+      { n: "tier", t: "String?" },
+      { n: "policyMemberNo", t: "String?" },
+      { n: "validFrom", t: "DateTime?" },
+      { n: "validUntil", t: "DateTime?" },
+      { n: "active", t: "Boolean" }
+    ],
+    rels: [
+      { to: "FamilyMember", kind: "→" },
+      { to: "InsurancePolicy", kind: "→" }
+    ],
+  },
+  InsurancePolicy: {
+    cluster: "family", x: 342, y: 958, w: 250,
+    desc: "Employee's medical insurance policy. Provider, tier (Premium/Tier2/Basic), policy number, validity dates, premium amount, scanned card URL.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "empId", t: "String" },
+      { n: "provider", t: "String" },
+      { n: "policyNumber", t: "String" },
+      { n: "tier", t: "String" },
+      { n: "coverageSummary", t: "String?" },
+      { n: "validFrom", t: "DateTime" },
+      { n: "validUntil", t: "DateTime" },
+      { n: "annualPremium", t: "Decimal?" },
+      { n: "currency", t: "String" },
+      { n: "cardUrl", t: "String?" },
+      { n: "active", t: "Boolean" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" },
+      { to: "InsuranceDependent", kind: "→" }
+    ],
+  },
+  Integration: {
+    cluster: "integration", x: 60, y: 6056, w: 250,
+    desc: "Registry of connected systems: ODOO, M365, Slack, Credly, DocuSign. Status reflects last health check; configJson holds non-secret settings (secrets via secretRef).",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "name", t: "String" },
+      { n: "category", t: "String" },
+      { n: "vendor", t: "String?" },
+      { n: "status", t: "String" },
+      { n: "lastSyncAt", t: "DateTime?" },
+      { n: "lastErrorAt", t: "DateTime?" },
+      { n: "lastErrorMessage", t: "String?" },
+      { n: "configJson", t: "Json?" },
+      { n: "secretRef", t: "String?" },
+      { n: "enabled", t: "Boolean" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "IntegrationSyncLog", kind: "→" }
+    ],
+  },
+  IntegrationSyncLog: {
+    cluster: "integration", x: 342, y: 6056, w: 250,
+    desc: "Per-sync execution record ('Pulled 142 employees from Entra at 02:00'). Status, items pulled/updated/failed, error message.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "integrationId", t: "String" },
+      { n: "startedAt", t: "DateTime" },
+      { n: "finishedAt", t: "DateTime?" },
+      { n: "status", t: "String" },
+      { n: "itemsPulled", t: "Int?" },
+      { n: "itemsUpdated", t: "Int?" },
+      { n: "itemsFailed", t: "Int?" },
+      { n: "errorMessage", t: "String?" },
+      { n: "metadataJson", t: "Json?" }
+    ],
+    rels: [
+      { to: "Integration", kind: "→" }
+    ],
+  },
+  KpiAcknowledgement: {
+    cluster: "kpi", x: 60, y: 2166, w: 250,
+    desc: "Employee's signature confirming all KPIs for a cycle have been received and understood. One ack per (employee, cycle). Captures signed text, timestamp, IP, document hash.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "empId", t: "String", fk: "Employee" },
+      { n: "cycleId", t: "String", fk: "KpiCycle" },
+      { n: "signedAt", t: "DateTime" },
+      { n: "signedVia", t: "String?" },
+      { n: "signature", t: "String" },
+      { n: "documentHash", t: "String?" },
+      { n: "ipAddress", t: "String?" },
+      { n: "preparedBy", t: "String?" },
+      { n: "reviewedBy", t: "String?" },
+      { n: "kpiCount", t: "Int" },
+      { n: "totalWeight", t: "Int" },
+      { n: "metadataJson", t: "Json?" },
+      { n: "createdAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" },
+      { to: "KpiCycle", kind: "→" }
+    ],
+  },
+  KpiAssignment: {
+    cluster: "kpi", x: 906, y: 1888, w: 250,
+    desc: "Individual employee's instance of a KPI for one cycle. The day-to-day workflow happens here: bidirectional approval (HR→TL or TL→HR), current value, progress submissions, validator decisions, final score.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "templateKrn", t: "String", fk: "KpiTemplate" },
+      { n: "empId", t: "String", fk: "Employee" },
+      { n: "cycleId", t: "String", fk: "KpiCycle" },
+      { n: "scope", t: "String?" },
+      { n: "scopeLabel", t: "String?" },
+      { n: "scopeRefId", t: "String?" },
+      { n: "weight", t: "Int" },
+      { n: "status", t: "KpiAssignmentStatus" },
+      { n: "approvalDirection", t: "KpiApprovalDirection?" },
+      { n: "currentValue", t: "String?" },
+      { n: "currentValueNumeric", t: "Decimal?" },
+      { n: "progressNote", t: "String?" },
+      { n: "lastProgressAt", t: "DateTime?" },
+      { n: "lastProgressBy", t: "String?" },
+      { n: "validatorEmpId", t: "String?" },
+      { n: "validatorRole", t: "KpiValidatorRole?" },
+      { n: "validatedAt", t: "DateTime?" },
+      { n: "validationNote", t: "String?" },
+      { n: "approvedBy", t: "String?" },
+      { n: "approvedAt", t: "DateTime?" },
+      { n: "draftedBy", t: "String?" },
+      { n: "draftedAt", t: "DateTime?" },
+      { n: "rejectedBy", t: "String?" },
+      { n: "rejectionReason", t: "String?" },
+      { n: "finalScore", t: "Decimal?" },
+      { n: "computedAt", t: "DateTime?" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" },
+      { to: "KpiCycle", kind: "→" },
+      { to: "KpiTemplate", kind: "→" }
+    ],
+  },
+  KpiCycle: {
+    cluster: "kpi", x: 60, y: 1888, w: 250,
+    desc: "Performance evaluation period (e.g. 'Q2 2026'). Templates, assignments, and acknowledgements all reference a cycle. Closing a cycle freezes scores into KpiCycleHistory.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "label", t: "String" },
+      { n: "startDate", t: "DateTime" },
+      { n: "endDate", t: "DateTime" },
+      { n: "status", t: "String" },
+      { n: "closedAt", t: "DateTime?" },
+      { n: "closedBy", t: "String?" },
+      { n: "weightingProfile", t: "Json?" },
+      { n: "notes", t: "String?" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "KpiAcknowledgement", kind: "→" },
+      { to: "KpiAssignment", kind: "→" },
+      { to: "KpiCycleHistory", kind: "→" }
+    ],
+  },
+  KpiCycleHistory: {
+    cluster: "kpi", x: 342, y: 2166, w: 250,
+    desc: "Frozen snapshot of an employee's performance at cycle close. Stores composite (0-120), status counts (red/amber/green), per-section breakdown as JSONB. Read-only after creation.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "empId", t: "String", fk: "Employee" },
+      { n: "cycleId", t: "String", fk: "KpiCycle" },
+      { n: "composite", t: "Decimal" },
+      { n: "kpiCount", t: "Int" },
+      { n: "redCount", t: "Int" },
+      { n: "amberCount", t: "Int" },
+      { n: "greenCount", t: "Int" },
+      { n: "sectionsJson", t: "Json?" },
+      { n: "assignmentsJson", t: "Json?" },
+      { n: "closedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" },
+      { to: "KpiCycle", kind: "→" }
+    ],
+  },
+  KpiSection: {
+    cluster: "kpi", x: 342, y: 1888, w: 250,
+    desc: "Grouping for KPI templates (e.g. 'Delivery Quality'). Team-scoped or global. sortOrder controls display.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "teamId", t: "String?", fk: "Team" },
+      { n: "title", t: "String" },
+      { n: "description", t: "String?" },
+      { n: "sortOrder", t: "Int" },
+      { n: "active", t: "Boolean" },
+      { n: "createdAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "KpiTemplate", kind: "→" },
+      { to: "Team", kind: "→" }
+    ],
+  },
+  KpiTemplate: {
+    cluster: "kpi", x: 624, y: 1888, w: 250,
+    desc: "Reusable KPI definition — what to measure. KRN (KPI Reference Number) is the human-readable primary key. Carries target, direction (higher/lower/exact), unit, frequency, validator role, source (manual/ODOO/auto).",
+    fields: [
+      { n: "krn", t: "String", pk: true },
+      { n: "sectionId", t: "String?", fk: "KpiSection" },
+      { n: "teamId", t: "String?", fk: "Team" },
+      { n: "positionIds", t: "String[]" },
+      { n: "title", t: "String" },
+      { n: "description", t: "String?" },
+      { n: "target", t: "String" },
+      { n: "targetNumeric", t: "Decimal?" },
+      { n: "unit", t: "String?" },
+      { n: "direction", t: "KpiDirection" },
+      { n: "weightDefault", t: "Int?" },
+      { n: "frequency", t: "KpiFrequency" },
+      { n: "sourceKind", t: "KpiSourceKind" },
+      { n: "sourceConfig", t: "Json?" },
+      { n: "validatorRole", t: "KpiValidatorRole" },
+      { n: "scopeKind", t: "String?" },
+      { n: "autoComputed", t: "Boolean" },
+      { n: "active", t: "Boolean" },
+      { n: "createdBy", t: "String?" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "KpiAssignment", kind: "→" },
+      { to: "KpiSection", kind: "→" },
+      { to: "Team", kind: "→" }
+    ],
+  },
+  LeaveApproval: {
+    cluster: "leave", x: 906, y: 1578, w: 250,
+    desc: "Each step in a leave request's approval chain. One row per approver. Decision: APPROVED/REJECTED/NULL=pending. Comment lets approver explain.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "leaveRequestId", t: "String" },
+      { n: "step", t: "Int" },
+      { n: "approverRole", t: "String" },
+      { n: "approverEmpId", t: "String?", fk: "Employee" },
+      { n: "decision", t: "String?" },
+      { n: "decidedAt", t: "DateTime?" },
+      { n: "comment", t: "String?" },
+      { n: "createdAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" },
+      { to: "LeaveRequest", kind: "→" }
+    ],
+  },
+  LeaveBalance: {
+    cluster: "leave", x: 342, y: 1578, w: 250,
+    desc: "Materialised per-employee per-year per-type. Updated by the leave service on approve. Fast to query — used to power balance widgets without recomputing.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "empId", t: "String" },
+      { n: "year", t: "Int" },
+      { n: "leaveType", t: "LeaveType" },
+      { n: "entitled", t: "Decimal" },
+      { n: "carriedOver", t: "Decimal" },
+      { n: "used", t: "Decimal" },
+      { n: "pending", t: "Decimal" },
+      { n: "remaining", t: "Decimal" },
+      { n: "lastRecalcAt", t: "DateTime" },
+      { n: "notes", t: "String?" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" }
+    ],
+  },
+  LeavePolicy: {
+    cluster: "leave", x: 60, y: 1578, w: 250,
+    desc: "Defines entitlement per leave type per employee group (or default for all). Holds approval chain, min notice, max consecutive days, carry-over rules.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "name", t: "String" },
+      { n: "leaveType", t: "LeaveType" },
+      { n: "entitlementDays", t: "Decimal" },
+      { n: "appliesToDepartmentId", t: "String?" },
+      { n: "appliesToTeamId", t: "String?" },
+      { n: "appliesToEmploymentType", t: "EmploymentType?" },
+      { n: "carryOverDays", t: "Decimal" },
+      { n: "carryOverExpiresAt", t: "DateTime?" },
+      { n: "paid", t: "Boolean" },
+      { n: "approvalChain", t: "String[]" },
+      { n: "minNoticeDays", t: "Int" },
+      { n: "maxConsecutiveDays", t: "Int?" },
+      { n: "active", t: "Boolean" },
+      { n: "effectiveFrom", t: "DateTime?" },
+      { n: "effectiveTo", t: "DateTime?" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+
+    ],
+  },
+  LeaveRequest: {
+    cluster: "leave", x: 624, y: 1578, w: 250,
+    desc: "Employee's leave application. Workflow: DRAFT → PENDING_PM → PENDING_TL → PENDING_HR → APPROVED (or REJECTED at any stage). Carries reason, attachments, half-day support.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "empId", t: "String" },
+      { n: "leaveType", t: "LeaveType" },
+      { n: "startDate", t: "DateTime" },
+      { n: "endDate", t: "DateTime" },
+      { n: "days", t: "Decimal" },
+      { n: "isHalfDay", t: "Boolean" },
+      { n: "halfDaySession", t: "String?" },
+      { n: "reason", t: "String?" },
+      { n: "status", t: "LeaveRequestStatus" },
+      { n: "attachmentUrls", t: "String[]" },
+      { n: "submittedAt", t: "DateTime?" },
+      { n: "finalisedAt", t: "DateTime?" },
+      { n: "currentApprover", t: "String?" },
+      { n: "approvalChain", t: "Json?" },
+      { n: "cancelledAt", t: "DateTime?" },
+      { n: "cancellationReason", t: "String?" },
+      { n: "notesForAttention", t: "String?" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" },
+      { to: "LeaveApproval", kind: "→" }
+    ],
+  },
+  LoginAttempt: {
+    cluster: "loginlog", x: 60, y: 7606, w: 250,
+    desc: "Append-only log of authentication attempts — success, failure, MFA required/failed. Captures email, IP, user agent, location, risk score. Drives suspicious-activity detection.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "email", t: "String?" },
+      { n: "empId", t: "String?" },
+      { n: "outcome", t: "String" },
+      { n: "ipAddress", t: "String?" },
+      { n: "userAgent", t: "String?" },
+      { n: "location", t: "String?" },
+      { n: "riskScore", t: "String?" },
+      { n: "failureReason", t: "String?" },
+      { n: "createdAt", t: "DateTime" }
+    ],
+    rels: [
+
+    ],
+  },
+  MfaDevice: {
+    cluster: "security", x: 342, y: 5746, w: 250,
+    desc: "Time-based OTP, hardware key, SMS, email fallback. Entra usually handles MFA, but this lets us record fallback methods.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "empId", t: "String" },
+      { n: "kind", t: "String" },
+      { n: "label", t: "String?" },
+      { n: "enrolledAt", t: "DateTime" },
+      { n: "lastUsedAt", t: "DateTime?" },
+      { n: "active", t: "Boolean" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" }
+    ],
+  },
+  Notification: {
+    cluster: "system", x: 624, y: 5158, w: 250,
+    desc: "In-portal notifications. notify() writes here and (optionally) dispatches to Slack/email. unread=true until user marks read.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "empId", t: "String?", fk: "Employee" },
+      { n: "templateId", t: "String?" },
+      { n: "category", t: "NotificationCategory" },
+      { n: "channel", t: "NotificationChannel" },
+      { n: "title", t: "String" },
+      { n: "body", t: "String" },
+      { n: "icon", t: "String?" },
+      { n: "color", t: "String?" },
+      { n: "unread", t: "Boolean" },
+      { n: "url", t: "String?" },
+      { n: "payload", t: "Json?" },
+      { n: "sentAt", t: "DateTime?" },
+      { n: "deliveryStatus", t: "String?" },
+      { n: "deliveryError", t: "String?" },
+      { n: "attemptCount", t: "Int" },
+      { n: "lastAttemptAt", t: "DateTime?" },
+      { n: "readAt", t: "DateTime?" },
+      { n: "createdAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" }
+    ],
+  },
+  NotificationTemplate: {
+    cluster: "system", x: 342, y: 5158, w: 250,
+    desc: "Reusable templates for system notifications. Mustache-style subject + body with placeholders. Per-category, per-channel (IN_APP/EMAIL/SLACK/TEAMS/SMS).",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "name", t: "String" },
+      { n: "category", t: "NotificationCategory" },
+      { n: "channels", t: "NotificationChannel[]" },
+      { n: "subjectTemplate", t: "String?" },
+      { n: "bodyTemplate", t: "String" },
+      { n: "icon", t: "String?" },
+      { n: "color", t: "String?" },
+      { n: "active", t: "Boolean" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+
+    ],
+  },
+  OffboardingCase: {
+    cluster: "requests", x: 60, y: 4582, w: 250,
+    desc: "Tracks departure — notice served, last working day, reason, exit interview, clearance checklist, final settlement, rehire eligibility.",
+    fields: [
+      { n: "empId", t: "String", pk: true },
+      { n: "initiatedAt", t: "DateTime" },
+      { n: "noticeServedAt", t: "DateTime?" },
+      { n: "lastWorkingDay", t: "DateTime?" },
+      { n: "reason", t: "OffboardingReason" },
+      { n: "reasonNote", t: "String?" },
+      { n: "initiatedBy", t: "String?" },
+      { n: "exitInterviewAt", t: "DateTime?" },
+      { n: "exitInterviewBy", t: "String?" },
+      { n: "exitInterviewNote", t: "String?" },
+      { n: "clearanceJson", t: "Json?" },
+      { n: "finalSettlementAmount", t: "Decimal?" },
+      { n: "finalSettlementCurrency", t: "String?" },
+      { n: "finalSettlementPaidAt", t: "DateTime?" },
+      { n: "rehireEligible", t: "Boolean" },
+      { n: "rehireNote", t: "String?" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" }
+    ],
+  },
+  OnboardingPlan: {
+    cluster: "onboarding", x: 60, y: 2476, w: 250,
+    desc: "Per-employee onboarding orchestration — start date, target completion, progress %, assigned buddy, status (active/completed/on_hold).",
+    fields: [
+      { n: "empId", t: "String", pk: true },
+      { n: "startedAt", t: "DateTime" },
+      { n: "targetCompletionAt", t: "DateTime?" },
+      { n: "completedAt", t: "DateTime?" },
+      { n: "progressPct", t: "Int" },
+      { n: "status", t: "String" },
+      { n: "assignedBuddyEmpId", t: "String?" },
+      { n: "notes", t: "String?" },
+      { n: "metadataJson", t: "Json?" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" }
+    ],
+  },
+  OnboardingStep: {
+    cluster: "onboarding", x: 342, y: 2476, w: 250,
+    desc: "Each step in the journey: NEO, mandatory training, joiner info, IT setup, meet stakeholders. Categorised, ordered, status-tracked, with optional due date and evidence URL.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "empId", t: "String" },
+      { n: "stepNum", t: "Int" },
+      { n: "category", t: "String" },
+      { n: "title", t: "String" },
+      { n: "description", t: "String?" },
+      { n: "status", t: "OnboardingStepStatus" },
+      { n: "assignedTo", t: "String?" },
+      { n: "startedAt", t: "DateTime?" },
+      { n: "completedAt", t: "DateTime?" },
+      { n: "dueAt", t: "DateTime?" },
+      { n: "evidenceUrl", t: "String?" },
+      { n: "notes", t: "String?" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" }
+    ],
+  },
+  OneOnOneNote: {
+    cluster: "performance", x: 906, y: 3406, w: 250,
+    desc: "Individual notes within a feedback session. Allows multiple notes per session. Visibility: PRIVATE, SHARED, HR_ONLY. Category: GROWTH, RISK, ACHIEVEMENT, BLOCKER.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "sessionId", t: "String?", fk: "FeedbackSession" },
+      { n: "authorEmpId", t: "String", fk: "Employee" },
+      { n: "subjectEmpId", t: "String", fk: "Employee" },
+      { n: "visibility", t: "String" },
+      { n: "category", t: "String?" },
+      { n: "body", t: "String" },
+      { n: "pinned", t: "Boolean" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" },
+      { to: "FeedbackSession", kind: "→" }
+    ],
+  },
+  PayrollAdjustment: {
+    cluster: "compensation", x: 624, y: 648, w: 250,
+    desc: "One-off bonuses, deductions, advances, arrears applied to a specific pay period. Doesn't change SalaryRecord — sits alongside it.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "salaryRecordId", t: "String?", fk: "SalaryRecord" },
+      { n: "empId", t: "String" },
+      { n: "payPeriod", t: "String" },
+      { n: "type", t: "String" },
+      { n: "amount", t: "Decimal" },
+      { n: "currency", t: "String" },
+      { n: "reason", t: "String?" },
+      { n: "approvedBy", t: "String?" },
+      { n: "approvedAt", t: "DateTime?" },
+      { n: "paidAt", t: "DateTime?" },
+      { n: "createdAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "SalaryRecord", kind: "→" }
+    ],
+  },
+  Permission: {
+    cluster: "perms", x: 60, y: 4892, w: 250,
+    desc: "Catalog of fine-grained permissions ('kpi.template.create', 'employee.salary.view'). Categorised for the admin UI.",
+    fields: [
+      { n: "key", t: "String", pk: true },
+      { n: "category", t: "String" },
+      { n: "label", t: "String" },
+      { n: "description", t: "String?" },
+      { n: "active", t: "Boolean" },
+      { n: "createdAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "RolePermission", kind: "→" }
+    ],
+  },
+  Position: {
+    cluster: "identity", x: 624, y: 60, w: 250,
+    desc: "Job catalog entry — Solutions Architect, Cloud Engineer, etc. Holds title, job family, level, grade band, and salary range.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "title", t: "String", unique: true },
+      { n: "titleAr", t: "String?" },
+      { n: "jobFamily", t: "String?" },
+      { n: "level", t: "Int?" },
+      { n: "grade", t: "String?" },
+      { n: "minSalary", t: "Decimal?" },
+      { n: "maxSalary", t: "Decimal?" },
+      { n: "currency", t: "String?" },
+      { n: "active", t: "Boolean" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" }
+    ],
+  },
+  ProbationCase: {
+    cluster: "performance", x: 342, y: 3406, w: 250,
+    desc: "Active probation tracking for new joiners. PM endorses, TL endorses, HR decides (pass/fail/extend). nextMeetingAt drives 1:1 reminders. Decision letter stored.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "empId", t: "String", unique: true },
+      { n: "startDate", t: "DateTime" },
+      { n: "endDate", t: "DateTime" },
+      { n: "extendedTo", t: "DateTime?" },
+      { n: "risk", t: "ProbationRisk" },
+      { n: "status", t: "String" },
+      { n: "nextMeetingAt", t: "DateTime?" },
+      { n: "pmEndorsedBy", t: "String?" },
+      { n: "pmEndorsedAt", t: "DateTime?" },
+      { n: "pmRecommendation", t: "String?" },
+      { n: "pmNote", t: "String?" },
+      { n: "tlEndorsedBy", t: "String?" },
+      { n: "tlEndorsedAt", t: "DateTime?" },
+      { n: "tlNote", t: "String?" },
+      { n: "outcome", t: "ProbationOutcome?" },
+      { n: "decidedBy", t: "String?" },
+      { n: "decidedAt", t: "DateTime?" },
+      { n: "decisionLetterUrl", t: "String?" },
+      { n: "decisionLetterSignedAt", t: "DateTime?" },
+      { n: "notes", t: "String?" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" }
+    ],
+  },
+  Project: {
+    cluster: "projects", x: 60, y: 3096, w: 250,
+    desc: "Mirror of ODOO project records. Filled by sync job. Customer, status, PM, team, budget, contract value, start/end dates.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "code", t: "String?" },
+      { n: "name", t: "String" },
+      { n: "customer", t: "String?" },
+      { n: "status", t: "ProjectStatus" },
+      { n: "pmEmpId", t: "String?" },
+      { n: "teamId", t: "String?", fk: "Team" },
+      { n: "startDate", t: "DateTime?" },
+      { n: "endDate", t: "DateTime?" },
+      { n: "budgetAmount", t: "Decimal?" },
+      { n: "budgetCurrency", t: "String?" },
+      { n: "contractValue", t: "Decimal?" },
+      { n: "description", t: "String?" },
+      { n: "odooLastSyncAt", t: "DateTime?" },
+      { n: "metadataJson", t: "Json?" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "ProjectAssignment", kind: "→" },
+      { to: "ProjectMilestone", kind: "→" },
+      { to: "Team", kind: "→" },
+      { to: "Timesheet", kind: "→" }
+    ],
+  },
+  ProjectAssignment: {
+    cluster: "projects", x: 342, y: 3096, w: 250,
+    desc: "Who's on which project, with role and allocation percent (100 = full-time on this project). Drives 'My Projects' widget and PM rating eligibility.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "projectId", t: "String" },
+      { n: "empId", t: "String", fk: "Employee" },
+      { n: "role", t: "String?" },
+      { n: "allocationPct", t: "Int" },
+      { n: "startDate", t: "DateTime?" },
+      { n: "endDate", t: "DateTime?" },
+      { n: "active", t: "Boolean" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" },
+      { to: "Project", kind: "→" }
+    ],
+  },
+  ProjectMilestone: {
+    cluster: "projects", x: 624, y: 3096, w: 250,
+    desc: "Project milestones with planned vs actual dates and status (planned/on_track/slipping/met/missed). Owner is an employee.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "projectId", t: "String" },
+      { n: "name", t: "String" },
+      { n: "description", t: "String?" },
+      { n: "plannedDate", t: "DateTime" },
+      { n: "actualDate", t: "DateTime?" },
+      { n: "status", t: "String" },
+      { n: "ownerEmpId", t: "String?" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Project", kind: "→" }
+    ],
+  },
+  ProjectRating: {
+    cluster: "performance", x: 60, y: 3406, w: 250,
+    desc: "Per-project performance review chain: PM rates → TL endorses → HR finalises. Feeds composite KPI via project_rating KPIs. Supports disputes.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "empId", t: "String", fk: "Employee" },
+      { n: "projectId", t: "String?" },
+      { n: "projectName", t: "String?" },
+      { n: "cycleId", t: "String?" },
+      { n: "pmEmpId", t: "String?", fk: "Employee" },
+      { n: "pmRating", t: "Decimal?" },
+      { n: "pmNote", t: "String?" },
+      { n: "pmCriteriaJson", t: "Json?" },
+      { n: "pmSubmittedAt", t: "DateTime?" },
+      { n: "tlEmpId", t: "String?" },
+      { n: "tlEndorsedAt", t: "DateTime?" },
+      { n: "tlNote", t: "String?" },
+      { n: "tlAdjustment", t: "Decimal?" },
+      { n: "hrFinalRating", t: "Decimal?" },
+      { n: "hrFinalisedAt", t: "DateTime?" },
+      { n: "hrFinalisedBy", t: "String?" },
+      { n: "hrNote", t: "String?" },
+      { n: "state", t: "ProjectRatingState" },
+      { n: "disputed", t: "Boolean" },
+      { n: "disputeNote", t: "String?" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" }
+    ],
+  },
+  Recognition: {
+    cluster: "performance", x: 60, y: 3684, w: 250,
+    desc: "Public or private kudos given between employees. Different from Badge — these are free-form messages with optional points. Drives the Recognition Wall.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "giverEmpId", t: "String", fk: "Employee" },
+      { n: "receiverEmpId", t: "String", fk: "Employee" },
+      { n: "category", t: "String" },
+      { n: "message", t: "String" },
+      { n: "points", t: "Int" },
+      { n: "isPublic", t: "Boolean" },
+      { n: "givenAt", t: "DateTime" },
+      { n: "createdAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" }
+    ],
+  },
+  Request: {
+    cluster: "requests", x: 60, y: 4304, w: 250,
+    desc: "Unified request workflow for everything that needs an approval chain: profile edits, document requests, reimbursements, assets, access, transfers. dataJson holds type-specific payload.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "empId", t: "String", fk: "Employee" },
+      { n: "type", t: "RequestType" },
+      { n: "status", t: "RequestStatus" },
+      { n: "title", t: "String" },
+      { n: "body", t: "String?" },
+      { n: "dataJson", t: "Json?" },
+      { n: "amount", t: "Decimal?" },
+      { n: "currency", t: "String?" },
+      { n: "attachmentUrls", t: "String[]" },
+      { n: "submittedAt", t: "DateTime?" },
+      { n: "completedAt", t: "DateTime?" },
+      { n: "closedAt", t: "DateTime?" },
+      { n: "closedBy", t: "String?" },
+      { n: "closeReason", t: "String?" },
+      { n: "parentRequestId", t: "String?", fk: "Request" },
+      { n: "externalRef", t: "String?" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" },
+      { to: "Request", kind: "→" },
+      { to: "RequestApproval", kind: "→" }
+    ],
+  },
+  RequestApproval: {
+    cluster: "requests", x: 342, y: 4304, w: 250,
+    desc: "Approval steps for a Request, mirroring LeaveApproval. One row per step; tracks role, approver, decision, comment.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "requestId", t: "String" },
+      { n: "step", t: "Int" },
+      { n: "approverRole", t: "String" },
+      { n: "approverEmpId", t: "String?", fk: "Employee" },
+      { n: "decision", t: "String?" },
+      { n: "decidedAt", t: "DateTime?" },
+      { n: "comment", t: "String?" },
+      { n: "createdAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" },
+      { to: "Request", kind: "→" }
+    ],
+  },
+  RoleDefinition: {
+    cluster: "perms", x: 342, y: 4892, w: 250,
+    desc: "Roles decoupled from the Role enum so Admin can rename or add custom roles without a schema migration. isSystem prevents deletion of core roles.",
+    fields: [
+      { n: "key", t: "String", pk: true },
+      { n: "label", t: "String" },
+      { n: "description", t: "String?" },
+      { n: "isSystem", t: "Boolean" },
+      { n: "active", t: "Boolean" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "RolePermission", kind: "→" }
+    ],
+  },
+  RolePermission: {
+    cluster: "perms", x: 624, y: 4892, w: 250,
+    desc: "Join table: which permissions each role has. Grants are audited (grantedBy, grantedAt).",
+    fields: [
+      { n: "roleKey", t: "String" },
+      { n: "permissionKey", t: "String" },
+      { n: "grantedBy", t: "String?" },
+      { n: "grantedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Permission", kind: "→" },
+      { to: "RoleDefinition", kind: "→" }
+    ],
+  },
+  SalaryRecord: {
+    cluster: "compensation", x: 60, y: 648, w: 250,
+    desc: "Append-only salary history. NEVER update — always insert a new row with effectiveDate. Current salary = newest row where endDate IS NULL. Holds basic + housing + transport + other allowances + computed gross, plus approver tracking.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "empId", t: "String" },
+      { n: "effectiveDate", t: "DateTime" },
+      { n: "endDate", t: "DateTime?" },
+      { n: "basic", t: "Decimal" },
+      { n: "housing", t: "Decimal" },
+      { n: "transport", t: "Decimal" },
+      { n: "otherAllowance", t: "Decimal" },
+      { n: "gross", t: "Decimal" },
+      { n: "currency", t: "String" },
+      { n: "payCycle", t: "String" },
+      { n: "reasonCode", t: "String" },
+      { n: "reasonNote", t: "String?" },
+      { n: "approvedBy", t: "String?" },
+      { n: "approvedAt", t: "DateTime?" },
+      { n: "nextReviewAt", t: "DateTime?" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "createdBy", t: "String?" }
+    ],
+    rels: [
+      { to: "AllowanceItem", kind: "→" },
+      { to: "Employee", kind: "→" },
+      { to: "PayrollAdjustment", kind: "→" }
+    ],
+  },
+  ScheduledJob: {
+    cluster: "system", x: 60, y: 5436, w: 250,
+    desc: "Background job queue. Nightly Entra sync, KPI cycle close, expiry reminders all schedule here. status: pending → running → done|failed.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "kind", t: "String" },
+      { n: "scheduleCron", t: "String?" },
+      { n: "runAt", t: "DateTime" },
+      { n: "status", t: "String" },
+      { n: "attempts", t: "Int" },
+      { n: "maxAttempts", t: "Int" },
+      { n: "payload", t: "Json?" },
+      { n: "result", t: "Json?" },
+      { n: "lastError", t: "String?" },
+      { n: "startedAt", t: "DateTime?" },
+      { n: "finishedAt", t: "DateTime?" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+
+    ],
+  },
+  SystemConfig: {
+    cluster: "system", x: 906, y: 5158, w: 250,
+    desc: "Key-value store for runtime config. KPI weighting tuners, feature flags, holiday calendar, etc. isSecret hides value in audit logs.",
+    fields: [
+      { n: "key", t: "String", pk: true },
+      { n: "category", t: "String?" },
+      { n: "value", t: "Json" },
+      { n: "description", t: "String?" },
+      { n: "isSecret", t: "Boolean" },
+      { n: "updatedBy", t: "String?" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+
+    ],
+  },
+  Team: {
+    cluster: "identity", x: 342, y: 60, w: 250,
+    desc: "Operational team within a department (e.g. Professional Services = PS). Owns KPI templates, projects, members; has a lead and optional manager.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "departmentId", t: "String?", fk: "Department" },
+      { n: "name", t: "String" },
+      { n: "short", t: "String" },
+      { n: "color", t: "String?" },
+      { n: "description", t: "String?" },
+      { n: "leadEmpId", t: "String?" },
+      { n: "managerEmpId", t: "String?" },
+      { n: "active", t: "Boolean" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Department", kind: "→" },
+      { to: "Employee", kind: "→" },
+      { to: "KpiSection", kind: "→" },
+      { to: "KpiTemplate", kind: "→" },
+      { to: "Project", kind: "→" }
+    ],
+  },
+  Timesheet: {
+    cluster: "projects", x: 906, y: 3096, w: 250,
+    desc: "Hours logged by employees on projects. ODOO is source of truth; we mirror for KPI calculations (utilisation, billable %). One row per (employee, day, project).",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "empId", t: "String", fk: "Employee" },
+      { n: "projectId", t: "String?", fk: "Project" },
+      { n: "date", t: "DateTime" },
+      { n: "hours", t: "Decimal" },
+      { n: "description", t: "String?" },
+      { n: "billable", t: "Boolean" },
+      { n: "approved", t: "Boolean" },
+      { n: "approvedBy", t: "String?" },
+      { n: "approvedAt", t: "DateTime?" },
+      { n: "odooEntryId", t: "String?", unique: true },
+      { n: "createdAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" },
+      { to: "Project", kind: "→" }
+    ],
+  },
+  TrainingAssignment: {
+    cluster: "training", x: 342, y: 2786, w: 250,
+    desc: "An employee's enrolment in a training. Status, due date, evidence URL, score, attempt count. Verified by HR. Reimbursable flag for paid courses.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "empId", t: "String", fk: "Employee" },
+      { n: "trainingId", t: "String", fk: "TrainingCatalogue" },
+      { n: "status", t: "TrainingStatus" },
+      { n: "reason", t: "String?" },
+      { n: "assignedAt", t: "DateTime" },
+      { n: "startedAt", t: "DateTime?" },
+      { n: "dueAt", t: "DateTime?" },
+      { n: "completedAt", t: "DateTime?" },
+      { n: "scorePct", t: "Decimal?" },
+      { n: "attemptCount", t: "Int" },
+      { n: "evidenceUrl", t: "String?" },
+      { n: "evidenceFileName", t: "String?" },
+      { n: "verifiedBy", t: "String?" },
+      { n: "verifiedAt", t: "DateTime?" },
+      { n: "rejectionReason", t: "String?" },
+      { n: "assignedBy", t: "String?" },
+      { n: "cost", t: "Decimal?" },
+      { n: "reimbursable", t: "Boolean" },
+      { n: "notes", t: "String?" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" },
+      { to: "TrainingCatalogue", kind: "→" },
+      { to: "TrainingCompletion", kind: "→" }
+    ],
+  },
+  TrainingCatalogue: {
+    cluster: "training", x: 60, y: 2786, w: 250,
+    desc: "Master list of available trainings — AWS courses, Coursera, in-house. Carries category, provider, duration, modality (online/instructor-led), mandatory flag, cert validity months, passing score, cost.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "title", t: "String" },
+      { n: "category", t: "String?" },
+      { n: "provider", t: "String?" },
+      { n: "description", t: "String?" },
+      { n: "durationHours", t: "Int?" },
+      { n: "modality", t: "String?" },
+      { n: "mandatory", t: "Boolean" },
+      { n: "validityMonths", t: "Int?" },
+      { n: "passingScore", t: "Int?" },
+      { n: "cost", t: "Decimal?" },
+      { n: "currency", t: "String?" },
+      { n: "url", t: "String?" },
+      { n: "appliesToRoles", t: "Role[]" },
+      { n: "appliesToPositions", t: "String[]" },
+      { n: "active", t: "Boolean" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "TrainingAssignment", kind: "→" }
+    ],
+  },
+  TrainingCompletion: {
+    cluster: "training", x: 624, y: 2786, w: 250,
+    desc: "Attempt-level history within a TrainingAssignment. One row per attempt — captures start/end, score, pass/fail, evidence.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "assignmentId", t: "String" },
+      { n: "empId", t: "String", fk: "Employee" },
+      { n: "attemptNumber", t: "Int" },
+      { n: "startedAt", t: "DateTime?" },
+      { n: "completedAt", t: "DateTime?" },
+      { n: "scorePct", t: "Decimal?" },
+      { n: "passed", t: "Boolean?" },
+      { n: "evidenceUrl", t: "String?" },
+      { n: "notes", t: "String?" },
+      { n: "createdAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" },
+      { to: "TrainingAssignment", kind: "→" }
+    ],
+  },
+  UserSession: {
+    cluster: "security", x: 60, y: 5746, w: 250,
+    desc: "Active and recent sign-in sessions. Lets Admin see 'who is currently logged in' + revoke a session by setting revokedAt.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "empId", t: "String" },
+      { n: "type", t: "SessionType" },
+      { n: "jti", t: "String", unique: true },
+      { n: "ipAddress", t: "String?" },
+      { n: "userAgent", t: "String?" },
+      { n: "device", t: "String?" },
+      { n: "location", t: "String?" },
+      { n: "loggedInAt", t: "DateTime" },
+      { n: "lastActivityAt", t: "DateTime" },
+      { n: "expiresAt", t: "DateTime" },
+      { n: "revokedAt", t: "DateTime?" },
+      { n: "revokedReason", t: "String?" },
+      { n: "riskScore", t: "String?" }
+    ],
+    rels: [
+      { to: "Employee", kind: "→" }
+    ],
+  },
+  WebhookDelivery: {
+    cluster: "integration", x: 906, y: 6056, w: 250,
+    desc: "Per-event delivery record. Created when we fire a webhook; updated as delivery succeeds or retries exhaust.",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "endpointId", t: "String" },
+      { n: "event", t: "String" },
+      { n: "payload", t: "Json" },
+      { n: "signature", t: "String?" },
+      { n: "status", t: "String" },
+      { n: "attempts", t: "Int" },
+      { n: "maxAttempts", t: "Int" },
+      { n: "lastError", t: "String?" },
+      { n: "lastAttemptAt", t: "DateTime?" },
+      { n: "deliveredAt", t: "DateTime?" },
+      { n: "responseCode", t: "Int?" },
+      { n: "responseBody", t: "String?" },
+      { n: "createdAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "WebhookEndpoint", kind: "→" }
+    ],
+  },
+  WebhookEndpoint: {
+    cluster: "integration", x: 624, y: 6056, w: 250,
+    desc: "Outbound webhook registry. Subscribed events, HMAC secret, failure count (auto-disables above threshold).",
+    fields: [
+      { n: "id", t: "String", pk: true },
+      { n: "name", t: "String" },
+      { n: "url", t: "String" },
+      { n: "secret", t: "String" },
+      { n: "events", t: "String[]" },
+      { n: "active", t: "Boolean" },
+      { n: "failureCount", t: "Int" },
+      { n: "failureThreshold", t: "Int" },
+      { n: "lastDeliveryAt", t: "DateTime?" },
+      { n: "lastSuccessAt", t: "DateTime?" },
+      { n: "lastFailureAt", t: "DateTime?" },
+      { n: "createdBy", t: "String?" },
+      { n: "createdAt", t: "DateTime" },
+      { n: "updatedAt", t: "DateTime" }
+    ],
+    rels: [
+      { to: "WebhookDelivery", kind: "→" }
+    ],
+  },
+};
+// ────────────────────────────────────────────────────────────────────────────
+//  RENDERING
+// ────────────────────────────────────────────────────────────────────────────
+
+// Cluster bounding boxes — computed lazily in renderClusters()
+const CLUSTER_BOXES = {};
+
+const canvas = document.getElementById("canvas");
+const lines  = document.getElementById("lines");
+const drawer = document.getElementById("drawer");
+const drawerHead = document.getElementById("drawerHead");
+const drawerTitle = document.getElementById("drawerTitle");
+const drawerSubtitle = document.getElementById("drawerSubtitle");
+const drawerBody = document.getElementById("drawerBody");
+const drawerClose = document.getElementById("drawerClose");
+const searchInput = document.getElementById("search");
+const resetBtn = document.getElementById("reset");
+const legend = document.getElementById("legend");
+
+let selectedTable = null;
+let activeClusters = new Set(Object.keys(CLUSTERS)); // all visible by default
+
+function tableHeight(name) {
+  // 30px head + 22px per field (preview) — fields beyond 8 truncated
+  const t = TABLES[name];
+  const shown = Math.min(t.fields.length, 8);
+  return 30 + shown * 22 + (t.fields.length > 8 ? 22 : 0);
+}
+
+function renderTables() {
+  Object.entries(TABLES).forEach(([name, t]) => {
+    const c = CLUSTERS[t.cluster];
+    const el = document.createElement("div");
+    el.className = "table";
+    el.dataset.name = name;
+    el.dataset.cluster = t.cluster;
+    el.style.cssText = `left:${t.x}px;top:${t.y}px;width:${t.w}px;--c:${c.color}`;
+    const previewFields = t.fields.slice(0, 8);
+    el.innerHTML = `
+      <div class="table__head">
+        <span>${name}</span>
+        <span class="table__head-icon">${t.fields.length}f</span>
+      </div>
+      <div class="table__body">
+        ${previewFields.map(f => `
+          <div class="table__field">
+            <span>
+              ${f.pk ? '<span class="table__pk-icon">⚿</span>' : f.fk ? '<span class="table__fk-icon">⛓</span>' : '<span class="table__pk-icon" style="visibility:hidden">·</span>'}
+              <span class="table__fname ${f.pk ? 'table__fname--pk' : f.fk ? 'table__fname--fk' : f.unique ? 'table__fname--unique' : ''}">${f.n}</span>
+            </span>
+            <span class="table__ftype">${f.t}</span>
+          </div>`).join("")}
+        ${t.fields.length > 8 ? `<div class="table__more">+ ${t.fields.length - 8} more fields · click to see all</div>` : ''}
+      </div>`;
+    el.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      selectTable(name);
+    });
+    canvas.appendChild(el);
+  });
+}
+
+function renderClusters() {
+  // Compute bounding box of each cluster (with padding)
+  const pad = 28;
+  Object.entries(TABLES).forEach(([name, t]) => {
+    const box = CLUSTER_BOXES[t.cluster] || { x1: Infinity, y1: Infinity, x2: -Infinity, y2: -Infinity };
+    box.x1 = Math.min(box.x1, t.x);
+    box.y1 = Math.min(box.y1, t.y);
+    box.x2 = Math.max(box.x2, t.x + t.w);
+    box.y2 = Math.max(box.y2, t.y + tableHeight(name));
+    CLUSTER_BOXES[t.cluster] = box;
+  });
+
+  Object.entries(CLUSTERS).forEach(([key, c]) => {
+    const box = CLUSTER_BOXES[key];
+    if (!box) return;
+    const el = document.createElement("div");
+    el.className = "cluster";
+    el.dataset.cluster = key;
+    el.style.cssText = `
+      left:${box.x1 - pad}px;
+      top:${box.y1 - pad}px;
+      width:${box.x2 - box.x1 + pad * 2}px;
+      height:${box.y2 - box.y1 + pad * 2}px;
+      --c:${c.color};`;
+    const lbl = document.createElement("div");
+    lbl.className = "cluster__label";
+    lbl.style.cssText = `--c:${c.color}`;
+    lbl.textContent = c.label;
+    el.appendChild(lbl);
+    canvas.insertBefore(el, lines.nextSibling);
+  });
+}
+
+function renderLegend() {
+  legend.innerHTML = Object.entries(CLUSTERS).map(([key, c]) => `
+    <span class="legend__item legend__item--active" data-cluster="${key}">
+      <span class="legend__swatch" style="background:${c.color}"></span>
+      ${c.label}
+    </span>`).join("");
+  legend.querySelectorAll(".legend__item").forEach(el => {
+    el.addEventListener("click", () => {
+      const k = el.dataset.cluster;
+      if (activeClusters.has(k)) activeClusters.delete(k);
+      else activeClusters.add(k);
+      el.classList.toggle("legend__item--active");
+      applyClusterFilter();
+    });
+  });
+}
+
+function applyClusterFilter() {
+  document.querySelectorAll(".table").forEach(t => {
+    const isActive = activeClusters.has(t.dataset.cluster);
+    t.style.display = isActive ? "block" : "none";
+  });
+  document.querySelectorAll(".cluster").forEach(c => {
+    const isActive = activeClusters.has(c.dataset.cluster);
+    c.style.display = isActive ? "block" : "none";
+  });
+  renderRelationshipLines();
+}
+
+function renderRelationshipLines() {
+  // Build pairs of FK relationships from the schema
+  const pairs = [];
+  Object.entries(TABLES).forEach(([from, t]) => {
+    if (!activeClusters.has(t.cluster)) return;
+    t.fields.forEach(f => {
+      if (f.fk && TABLES[f.fk] && activeClusters.has(TABLES[f.fk].cluster)) {
+        pairs.push({ from, to: f.fk, viaField: f.n });
+      }
+    });
+  });
+
+  const NS = "http://www.w3.org/2000/svg";
+  lines.innerHTML = "";
+  pairs.forEach((p, i) => {
+    const a = TABLES[p.from];
+    const b = TABLES[p.to];
+    // Edge midpoints — pick the closer sides
+    const ax = a.x + a.w / 2;
+    const ay = a.y + tableHeight(p.from) / 2;
+    const bx = b.x + b.w / 2;
+    const by = b.y + tableHeight(p.to) / 2;
+    // Anchor on right or left depending on direction
+    const aRight = ax < bx;
+    const ax1 = aRight ? a.x + a.w : a.x;
+    const bx1 = aRight ? b.x : b.x + b.w;
+    const ay1 = ay;
+    const by1 = by;
+    // Cubic bezier with horizontal control points
+    const dx = Math.abs(bx1 - ax1);
+    const c1x = ax1 + (aRight ? dx * 0.5 : -dx * 0.5);
+    const c2x = bx1 + (aRight ? -dx * 0.5 : dx * 0.5);
+    const path = document.createElementNS(NS, "path");
+    path.setAttribute("d", `M ${ax1} ${ay1} C ${c1x} ${ay1}, ${c2x} ${by1}, ${bx1} ${by1}`);
+    path.dataset.from = p.from;
+    path.dataset.to = p.to;
+    lines.appendChild(path);
+  });
+}
+
+function selectTable(name) {
+  if (selectedTable === name) {
+    deselectTable();
+    return;
+  }
+  selectedTable = name;
+  const t = TABLES[name];
+  const c = CLUSTERS[t.cluster];
+
+  // Visual state
+  document.querySelectorAll(".table").forEach(el => {
+    el.classList.remove("table--highlight", "table--connected", "table--dimmed");
+    if (el.dataset.name === name) {
+      el.classList.add("table--highlight");
+    } else {
+      el.classList.add("table--dimmed");
+    }
+  });
+  // Mark FK-connected tables (incoming + outgoing)
+  const connected = new Set();
+  t.fields.forEach(f => { if (f.fk) connected.add(f.fk); });
+  Object.entries(TABLES).forEach(([n, tt]) => {
+    if (tt.fields.some(f => f.fk === name)) connected.add(n);
+  });
+  connected.forEach(n => {
+    const el = document.querySelector(`.table[data-name="${n}"]`);
+    if (el) {
+      el.classList.remove("table--dimmed");
+      el.classList.add("table--connected");
+    }
+  });
+  // Lines: highlight ones touching this table, dim others
+  document.querySelectorAll(".lines path").forEach(p => {
+    p.classList.remove("line--highlight", "line--dimmed");
+    if (p.dataset.from === name || p.dataset.to === name) {
+      p.classList.add("line--highlight");
+    } else {
+      p.classList.add("line--dimmed");
+    }
+  });
+
+  // Drawer
+  drawerHead.style.setProperty("--c", c.color);
+  drawerTitle.textContent = name;
+  drawerSubtitle.textContent = c.label;
+  drawerBody.innerHTML = `
+    <div class="drawer__section">
+      <h3 class="drawer__section-title">Purpose</h3>
+      <p class="drawer__desc">${t.desc}</p>
+    </div>
+    <div class="drawer__section">
+      <h3 class="drawer__section-title">Fields · ${t.fields.length}</h3>
+      ${t.fields.map(f => `
+        <div class="drawer__field">
+          <span class="drawer__field-name ${f.pk ? 'drawer__field-name--pk' : f.fk ? 'drawer__field-name--fk' : f.unique ? 'drawer__field-name--unique' : ''}">
+            ${f.n}
+            ${f.pk ? '<span class="drawer__field-badge drawer__field-badge--pk">PK</span>' : ''}
+            ${f.fk ? `<span class="drawer__field-badge drawer__field-badge--fk">FK → ${f.fk}</span>` : ''}
+            ${f.unique && !f.pk ? '<span class="drawer__field-badge drawer__field-badge--unique">UNIQUE</span>' : ''}
+            ${f.idx ? '<span class="drawer__field-badge drawer__field-badge--idx">IDX</span>' : ''}
+            ${f.note ? `<div style="font-size:11px;color:var(--ink-500);margin-top:2px;font-family:var(--font-display)">${f.note}</div>` : ''}
+          </span>
+          <span class="drawer__field-type">${f.t}</span>
+        </div>`).join("")}
+    </div>
+    ${t.rels.length > 0 ? `
+      <div class="drawer__section">
+        <h3 class="drawer__section-title">Relationships · ${t.rels.length}</h3>
+        ${t.rels.map(r => `
+          <div class="drawer__rel">
+            <span class="drawer__rel-target" data-target="${r.to}">→ ${r.to}</span>
+            <span class="drawer__rel-kind">${r.kind}${r.via ? ` · ${r.via}` : ''}</span>
+          </div>`).join("")}
+      </div>` : ''}
+  `;
+  drawer.classList.add("drawer--open");
+
+  // Wire relationship links to navigate
+  drawerBody.querySelectorAll("[data-target]").forEach(el => {
+    el.addEventListener("click", () => {
+      const target = el.dataset.target;
+      if (TABLES[target]) {
+        selectTable(target);
+        scrollToTable(target);
+      }
+    });
+  });
+}
+
+function deselectTable() {
+  selectedTable = null;
+  document.querySelectorAll(".table").forEach(el => {
+    el.classList.remove("table--highlight", "table--connected", "table--dimmed");
+  });
+  document.querySelectorAll(".lines path").forEach(p => {
+    p.classList.remove("line--highlight", "line--dimmed");
+  });
+  drawer.classList.remove("drawer--open");
+}
+
+function scrollToTable(name) {
+  const el = document.querySelector(`.table[data-name="${name}"]`);
+  if (!el) return;
+  const wrap = document.getElementById("canvasWrap");
+  const elRect = el.getBoundingClientRect();
+  const wrapRect = wrap.getBoundingClientRect();
+  wrap.scrollTo({
+    left: el.offsetLeft - wrapRect.width / 2 + el.offsetWidth / 2,
+    top: el.offsetTop - wrapRect.height / 2 + el.offsetHeight / 2,
+    behavior: "smooth",
+  });
+}
+
+// ── Search ────────────────────────────────────────────────────────────────
+searchInput.addEventListener("input", () => {
+  const q = searchInput.value.toLowerCase().trim();
+  if (!q) {
+    document.querySelectorAll(".table").forEach(el => {
+      el.style.opacity = "1";
+      el.style.boxShadow = "";
+    });
+    return;
+  }
+  Object.entries(TABLES).forEach(([name, t]) => {
+    const el = document.querySelector(`.table[data-name="${name}"]`);
+    if (!el) return;
+    const matches = name.toLowerCase().includes(q) || t.fields.some(f => f.n.toLowerCase().includes(q));
+    if (matches) {
+      el.style.opacity = "1";
+      el.style.boxShadow = "0 0 0 3px var(--amber), 0 6px 16px rgba(180,83,9,0.18)";
+    } else {
+      el.style.opacity = "0.18";
+      el.style.boxShadow = "";
+    }
+  });
+});
+
+// ── Reset ────────────────────────────────────────────────────────────────
+resetBtn.addEventListener("click", () => {
+  searchInput.value = "";
+  searchInput.dispatchEvent(new Event("input"));
+  deselectTable();
+  activeClusters = new Set(Object.keys(CLUSTERS));
+  legend.querySelectorAll(".legend__item").forEach(el => el.classList.add("legend__item--active"));
+  applyClusterFilter();
+  document.getElementById("canvasWrap").scrollTo({ left: 0, top: 0, behavior: "smooth" });
+});
+
+drawerClose.addEventListener("click", deselectTable);
+
+// Click outside table to deselect (but allow click on canvas itself)
+document.getElementById("canvasWrap").addEventListener("click", (ev) => {
+  if (ev.target.closest(".table") || ev.target.closest(".drawer")) return;
+  deselectTable();
+});
+
+// Keyboard escape
+document.addEventListener("keydown", (ev) => {
+  if (ev.key === "Escape") deselectTable();
+});
+
+// ── Boot ──────────────────────────────────────────────────────────────────
+canvas.style.setProperty("--canvas-w", CANVAS_W + "px");
+canvas.style.setProperty("--canvas-h", CANVAS_H + "px");
+lines.setAttribute("viewBox", `0 0 ${CANVAS_W} ${CANVAS_H}`);
+
+renderClusters();
+renderTables();
+renderLegend();
+renderRelationshipLines();
+</script>
+
+</body>
+</html>

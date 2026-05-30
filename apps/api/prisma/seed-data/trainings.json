@@ -1,0 +1,110 @@
+[
+  {
+    "id": "T001",
+    "title": "AWS Cloud Practitioner Essentials",
+    "provider": "AWS",
+    "duration": "6 hrs",
+    "required": "All technical",
+    "enrolled": 42,
+    "completion": 91
+  },
+  {
+    "id": "T002",
+    "title": "AWS Solutions Architect Associate",
+    "provider": "AWS",
+    "duration": "30 hrs",
+    "required": "SA track",
+    "enrolled": 18,
+    "completion": 67
+  },
+  {
+    "id": "T003",
+    "title": "AWS DevOps Engineer Professional",
+    "provider": "AWS",
+    "duration": "40 hrs",
+    "required": "DevOps",
+    "enrolled": 9,
+    "completion": 56
+  },
+  {
+    "id": "T004",
+    "title": "AWS Sales Accreditation",
+    "provider": "AWS",
+    "duration": "2 hrs",
+    "required": "All",
+    "enrolled": 147,
+    "completion": 88
+  },
+  {
+    "id": "T005",
+    "title": "AWS Cloud Economics",
+    "provider": "AWS",
+    "duration": "3 hrs",
+    "required": "All",
+    "enrolled": 147,
+    "completion": 84
+  },
+  {
+    "id": "T006",
+    "title": "AWS Well-Architected Framework",
+    "provider": "AWS",
+    "duration": "5 hrs",
+    "required": "All technical",
+    "enrolled": 47,
+    "completion": 79
+  },
+  {
+    "id": "T007",
+    "title": "AWS Generative AI Essentials",
+    "provider": "AWS",
+    "duration": "4 hrs",
+    "required": "All",
+    "enrolled": 89,
+    "completion": 62
+  },
+  {
+    "id": "T008",
+    "title": "AWS Cybersecurity Awareness",
+    "provider": "AWS",
+    "duration": "2 hrs",
+    "required": "All",
+    "enrolled": 147,
+    "completion": 93
+  },
+  {
+    "id": "T009",
+    "title": "Security Awareness Training",
+    "provider": "KnowBe4",
+    "duration": "1 hr",
+    "required": "All",
+    "enrolled": 147,
+    "completion": 97
+  },
+  {
+    "id": "T010",
+    "title": "SUDO Profile Training",
+    "provider": "Internal",
+    "duration": "1.5 hrs",
+    "required": "All new joiners",
+    "enrolled": 12,
+    "completion": 75
+  },
+  {
+    "id": "T011",
+    "title": "Terraform Associate Prep",
+    "provider": "HashiCorp",
+    "duration": "20 hrs",
+    "required": "DevOps recommended",
+    "enrolled": 6,
+    "completion": 50
+  },
+  {
+    "id": "T012",
+    "title": "AWS Security Specialty",
+    "provider": "AWS",
+    "duration": "35 hrs",
+    "required": "Optional",
+    "enrolled": 3,
+    "completion": 33
+  }
+]

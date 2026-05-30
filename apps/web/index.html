@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SUDO Employee Portal · Sign in</title>
+<meta name="robots" content="noindex,nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --navy: #204D9B;
+  --navy-deep: #0F1A2E;
+  --bright: #189CD9;
+  --bright-soft: #5BB2E0;
+  --bright-bg: #E5F0FB;
+
+  --ink-900: #0F1A2E;
+  --ink-700: #2F3B52;
+  --ink-500: #5B6781;
+  --ink-400: #8591A8;
+  --ink-300: #B8C0CF;
+  --ink-200: #DDE2EC;
+  --ink-100: #EEF1F7;
+  --ink-50:  #F5F7FB;
+
+  --paper: #FFFFFF;
+  --font-display: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", monospace;
+
+  --radius: 10px;
+  --radius-sm: 6px;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --shadow-md: 0 8px 24px rgba(15, 26, 46, 0.08), 0 2px 6px rgba(15, 26, 46, 0.04);
+  --shadow-lg: 0 20px 50px rgba(15, 26, 46, 0.12), 0 8px 16px rgba(15, 26, 46, 0.06);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-display);
+  color: var(--ink-900);
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(24, 156, 217, 0.10), transparent),
+    radial-gradient(ellipse 50% 50% at 95% 50%, rgba(32, 77, 155, 0.05), transparent),
+    radial-gradient(ellipse 60% 40% at 5% 90%, rgba(232, 154, 30, 0.04), transparent),
+    var(--ink-50);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page { flex: 1; display: grid; place-items: center; padding: 40px 24px; }
+.signin { width: 100%; max-width: 420px; }
+
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 56px;
+}
+.brand__mark {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--bright), var(--bright-soft));
+  border-radius: var(--radius-sm);
+  color: white;
+}
+.brand__mark svg { width: 22px; height: 22px; }
+.brand__name { font-size: 16px; font-weight: 800; letter-spacing: -0.01em; color: var(--ink-900); line-height: 1; }
+.brand__sub { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-500); margin-top: 3px; }
+.brand__text { line-height: 1; }
+
+.hero { text-align: center; margin-bottom: 36px; }
+.hero__title { font-size: 36px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; color: var(--ink-900); margin: 0 0 10px; }
+.hero__sub { font-size: 14px; color: var(--ink-500); margin: 0; line-height: 1.55; }
+
+.signin-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  height: 48px;
+  background: var(--ink-900);
+  color: white;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 220ms var(--ease);
+  box-shadow: var(--shadow-md);
+}
+.signin-btn:hover { background: #1A2540; box-shadow: var(--shadow-lg); transform: translateY(-1px); }
+.signin-btn:focus-visible { outline: 2px solid var(--bright); outline-offset: 2px; }
+.signin-btn svg { flex-shrink: 0; }
+
+.tenant {
+  text-align: center;
+  margin-top: 14px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--ink-400);
+}
+
+.demo { margin-top: 56px; padding-top: 32px; border-top: 1px solid var(--ink-200); }
+.demo__label {
+  text-align: center;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+  margin-bottom: 14px;
+}
+.demo__grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.demo__tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 8px 16px;
+  background: var(--paper);
+  border: 1px solid var(--ink-200);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all 200ms var(--ease);
+  position: relative;
+  cursor: pointer;
+}
+.demo__tile:hover { border-color: var(--ink-300); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.demo__icon { width: 32px; height: 32px; display: grid; place-items: center; color: var(--ink-500); transition: color 200ms var(--ease); }
+.demo__icon svg { width: 18px; height: 18px; }
+.demo__tile:hover .demo__icon { color: var(--ink-900); }
+.demo__label-text { font-size: 11px; font-weight: 600; color: var(--ink-700); line-height: 1.2; text-align: center; }
+.demo__tile:hover .demo__label-text { color: var(--ink-900); }
+.demo__arrow {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: var(--ink-300);
+  transition: all 200ms var(--ease);
+  opacity: 0;
+}
+.demo__tile:hover .demo__arrow { color: var(--ink-700); opacity: 1; }
+
+.demo__tile::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 5px;
+  height: 2px;
+  border-radius: 2px;
+  opacity: 0.7;
+}
+.demo__tile--employee::after { background: linear-gradient(90deg, var(--navy-deep), var(--navy)); }
+.demo__tile--hr::after       { background: linear-gradient(90deg, #0C7DB0, var(--bright)); }
+.demo__tile--pm::after       { background: linear-gradient(90deg, #0A5A66, #0F7A8A); }
+.demo__tile--tl::after       { background: linear-gradient(90deg, #134E4A, #14B8A6); }
+.demo__tile--admin::after    { background: linear-gradient(90deg, #C77A00, #E89A1E); }
+
+.foot {
+  padding: 18px 24px 22px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--ink-400);
+  line-height: 1.5;
+}
+.foot__separator { color: var(--ink-300); margin: 0 6px; }
+
+@media (max-width: 480px) {
+  .hero__title { font-size: 28px; }
+  .demo__grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<main class="page">
+  <div class="signin">
+
+    <div class="brand">
+      <div class="brand__mark">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h12a4 4 0 0 1 0 8H8a4 4 0 0 0 0 8h12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="brand__text">
+        <div class="brand__name">SUDO</div>
+        <div class="brand__sub">Consultants</div>
+      </div>
+    </div>
+
+    <div class="hero">
+      <h1 class="hero__title">Welcome back</h1>
+      <p class="hero__sub">Sign in with your SUDO Microsoft account to continue</p>
+    </div>
+
+    <a class="signin-btn" href="#" id="msft-signin">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <rect x="3" y="3" width="8" height="8" fill="#F25022"/>
+        <rect x="13" y="3" width="8" height="8" fill="#7FBA00"/>
+        <rect x="3" y="13" width="8" height="8" fill="#00A4EF"/>
+        <rect x="13" y="13" width="8" height="8" fill="#FFB900"/>
+      </svg>
+      Continue with Microsoft
+    </a>
+
+    <div class="tenant">sudoconsultants.onmicrosoft.com</div>
+
+    <div class="demo">
+      <div class="demo__label">Demo · skip auth and view as</div>
+      <div class="demo__grid">
+        <a class="demo__tile demo__tile--employee" href="./employee/index.html" data-empid="E002">
+          <div class="demo__icon">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="currentColor" stroke-width="1.8"/></svg>
+          </div>
+          <div class="demo__label-text">Employee</div>
+          <svg class="demo__arrow" width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0l-7-7m7 7l-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+
+        <a class="demo__tile demo__tile--hr" href="./hr/index.html" data-empid="E004">
+          <div class="demo__icon">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M2 21c0-3.9 3.1-7 7-7s7 3.1 7 7M16 11a4 4 0 100-8M22 21c0-3-2-5.5-5-6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+          <div class="demo__label-text">HR</div>
+          <svg class="demo__arrow" width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0l-7-7m7 7l-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+
+        <a class="demo__tile demo__tile--pm" href="./pm/index.html" data-empid="E006">
+          <div class="demo__icon">
+            <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="7" width="20" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16" stroke="currentColor" stroke-width="1.8"/></svg>
+          </div>
+          <div class="demo__label-text">Project Manager</div>
+          <svg class="demo__arrow" width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0l-7-7m7 7l-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+
+        <a class="demo__tile demo__tile--tl" href="./team_lead/index.html" data-empid="E003">
+          <div class="demo__icon">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="demo__label-text">Team Lead</div>
+          <svg class="demo__arrow" width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0l-7-7m7 7l-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+
+        <a class="demo__tile demo__tile--admin" href="./admin/index.html" data-empid="E001">
+          <div class="demo__icon">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 9.5-8 10-4.5-.5-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="demo__label-text">Super Admin</div>
+          <svg class="demo__arrow" width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0l-7-7m7 7l-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="foot">
+  © 2026 SUDO Consultants
+  <span class="foot__separator">·</span> UAE
+  <span class="foot__separator">·</span> KSA
+  <span class="foot__separator">·</span> AWS Advanced Tier Services Partner
+</footer>
+
+<script>
+  // Microsoft sign-in → real Entra login flow (works once Entra is configured)
+  document.getElementById('msft-signin').addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = '/api/v1/auth/login';
+  });
+
+  // Demo role tiles → store the chosen demo employee id, then navigate.
+  // The portal's auth bootstrap reads sudo_demo_empid and dev-logs-in as them.
+  document.querySelectorAll('.demo__tile[data-empid]').forEach((tile) => {
+    tile.addEventListener('click', (e) => {
+      try { sessionStorage.setItem('sudo_demo_empid', tile.getAttribute('data-empid')); } catch (err) {}
+      // let the normal href navigation proceed
+    });
+  });
+</script>
+
+</body>
+</html>

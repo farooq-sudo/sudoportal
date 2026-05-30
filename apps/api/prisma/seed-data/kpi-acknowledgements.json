@@ -1,0 +1,62 @@
+[
+  {
+    "id": "AK-2026-001",
+    "empId": "E075",
+    "cycleId": "q2-2026",
+    "signedAt": "2026-04-05",
+    "signedVia": "portal",
+    "agreement": true,
+    "disagreementNote": "",
+    "preparedBy": "E061",
+    "reviewedBy": "E062",
+    "approvedBy": "E004",
+    "kpiCount": 8,
+    "totalWeight": 100,
+    "signature": "Ameer Hamza"
+  },
+  {
+    "id": "AK-2026-002",
+    "empId": "E072",
+    "cycleId": "q2-2026",
+    "signedAt": "2026-04-06",
+    "signedVia": "portal",
+    "agreement": true,
+    "disagreementNote": "",
+    "preparedBy": "E061",
+    "reviewedBy": "E062",
+    "approvedBy": "E004",
+    "kpiCount": 12,
+    "totalWeight": 100,
+    "signature": "Bilal Tariq"
+  },
+  {
+    "id": "AK-2026-003",
+    "empId": "E001",
+    "cycleId": "q2-2026",
+    "signedAt": "2026-04-03",
+    "signedVia": "portal",
+    "agreement": true,
+    "disagreementNote": "",
+    "preparedBy": "E003",
+    "reviewedBy": "E018",
+    "approvedBy": "E004",
+    "kpiCount": 5,
+    "totalWeight": 100,
+    "signature": "Ahmed Al Rashid"
+  },
+  {
+    "id": "AK-2026-004",
+    "empId": "E008",
+    "cycleId": "q2-2026",
+    "signedAt": "2026-04-17",
+    "signedVia": "portal",
+    "agreement": true,
+    "disagreementNote": "",
+    "preparedBy": "E003",
+    "reviewedBy": "E018",
+    "approvedBy": "E004",
+    "kpiCount": 4,
+    "totalWeight": 80,
+    "signature": "Reem Al Otaibi"
+  }
+]

@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: sudo
+          POSTGRES_PASSWORD: sudo
+          POSTGRES_DB: sudo_portal_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npm --workspace apps/api run db:generate || npx --workspace apps/api prisma generate
+
+      - name: TypeScript compile check
+        run: npm --workspace apps/api run lint
+
+      - name: Run migrations (test DB)
+        env:
+          DATABASE_URL: postgres://sudo:sudo@localhost:5432/sudo_portal_test
+        run: |
+          cd apps/api
+          # If migrations exist, deploy them. Otherwise, push schema directly
+          # (acceptable for CI smoke tests since the schema is the truth).
+          if [ -n "$(ls -A prisma/migrations 2>/dev/null | grep -v gitkeep)" ]; then
+            npx prisma migrate deploy
+          else
+            npx prisma db push --accept-data-loss
+          fi
+
+      - name: Smoke tests
+        env:
+          DATABASE_URL: postgres://sudo:sudo@localhost:5432/sudo_portal_test
+          JWT_SECRET: ci-test-secret-not-real-1234567890abcdef1234567890abcdef
+          NODE_ENV: test
+          CORS_ORIGINS: http://localhost:3000
+          WEBHOOK_SIGNING_SECRET: ci-webhook-secret-1234567890abcdef
+        run: npm --workspace apps/api test
